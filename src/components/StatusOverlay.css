@@ -1,0 +1,12 @@
+.status-overlay {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 1;
+  font: 12px/1.4 monospace;
+  color: #eee;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 6px 10px;
+  border-radius: 4px;
+  pointer-events: none;
+}
