@@ -12,11 +12,13 @@ const MAX_VISIBLE_TILESETS = 2
 
 // The backend regenerates tileset.json on every request at the same url,
 // but Tile3DLayer keys its loaded state off the exact url string — so each
-// poll gets a cache-busting `t` param to force a real reload.
-export function useLiveTileset(tilesetUrl: string, pollMs: number): TilesetEntry[] {
+// poll gets a cache-busting `t` param to force a real reload. A null url
+// (not known yet) means don't poll.
+export function useLiveTileset(tilesetUrl: string | null, pollMs: number): TilesetEntry[] {
   const [tilesets, setTilesets] = useState<TilesetEntry[]>([])
 
   useEffect(() => {
+    if (!tilesetUrl) return
     const tick = () => {
       const url = new URL(tilesetUrl)
       url.searchParams.set('t', String(Date.now()))
