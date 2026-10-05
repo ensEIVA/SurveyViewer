@@ -1,0 +1,14 @@
+syntax = "proto3";
+package nexus.v1;
+
+service NexusService {
+    rpc GetNodeDescriptionEndpoint(GetNodeDescriptionEndpointRequest) returns (GetNodeDescriptionEndpointResponse);
+}
+
+message GetNodeDescriptionEndpointRequest {
+    int32 node_id = 1;
+}
+
+message GetNodeDescriptionEndpointResponse {
+    string node_description_endpoint = 1;
+}

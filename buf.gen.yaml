@@ -1,0 +1,9 @@
+# `npm run generate` — regenerates src/gen from proto/. Generated code is
+# committed, so a fresh clone builds without running buf first.
+version: v2
+inputs:
+  - directory: proto
+plugins:
+  - local: protoc-gen-es
+    out: src/gen
+    opt: target=ts

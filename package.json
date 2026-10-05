@@ -7,9 +7,13 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "generate": "buf generate"
   },
   "dependencies": {
+    "@bufbuild/protobuf": "^2.16.0",
+    "@connectrpc/connect": "^2.2.0",
+    "@connectrpc/connect-web": "^2.2.0",
     "@deck.gl/core": "^9.4.0",
     "@deck.gl/geo-layers": "^9.4.0",
     "@deck.gl/layers": "^9.4.0",
@@ -21,6 +25,8 @@
     "react-dom": "^19.2.8"
   },
   "devDependencies": {
+    "@bufbuild/buf": "^1.73.0",
+    "@bufbuild/protoc-gen-es": "^2.16.0",
     "@types/node": "^24.13.3",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.7",
