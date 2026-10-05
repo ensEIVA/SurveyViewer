@@ -1,8 +1,9 @@
 // Nexus — the only backend this viewer talks to (it fronts Meridian).
 // Answers NexusService over grpc-web, and serves tileset.json/.pnts and
 // recent points over plain HTTP.
-// Overridable per environment via .env (VITE_API_URL=...).
-export const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:2008'
+// Defaults to a Nexus running locally; point at another one via
+// .env.local (VITE_API_URL=http://<host>:<port>).
+export const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:5007'
 
 // Node whose description endpoint (tileset url) is asked for at startup.
 export const ROOT_NODE_ID = 0
