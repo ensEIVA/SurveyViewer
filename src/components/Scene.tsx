@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import DeckGL from '@deck.gl/react'
 import { MapView, type MapViewState } from '@deck.gl/core'
-import { API_URL, TILESET_POLL_MS } from '../config'
+import { API_URL, RECENT_POINTS_POLL_MS, TILESET_POLL_MS } from '../config'
 import { useLiveTileset } from '../hooks/useLiveTileset'
+import { useRecentPoints } from '../hooks/useRecentPoints'
+import { makeRecentPointsLayer } from '../layers/recentPointsLayer'
 import { makeTilesetLayer } from '../layers/tilesetLayer'
 import { StatusOverlay } from './StatusOverlay'
 
@@ -17,6 +19,7 @@ const INITIAL_VIEW_STATE: MapViewState = {
 const MAP_VIEW = new MapView({ repeat: true })
 
 const TILESET_URL = `${API_URL}/tileset.json`
+const RECENT_POINTS_URL = `${API_URL}/recent-points.bin`
 
 // Controlled view state (rather than DeckGL's initialViewState) so the
 // camera can be re-centered from code once a tileset reports where its
@@ -28,8 +31,9 @@ export function Scene() {
   const [errorUrl, setErrorUrl] = useState<string | null>(null)
   const tilesets = useLiveTileset(TILESET_URL, TILESET_POLL_MS)
   const latest = tilesets.at(-1)
+  const recentPoints = useRecentPoints(RECENT_POINTS_URL, RECENT_POINTS_POLL_MS)
 
-  const layers = tilesets.map(entry =>
+  const tilesetLayers = tilesets.map(entry =>
     makeTilesetLayer(entry, {
       onTilesetLoad: tileset3d => {
         const { cartographicCenter, zoom } = tileset3d
@@ -50,6 +54,8 @@ export function Scene() {
       },
     }),
   )
+  // Drawn last so it sits on top of the tiles.
+  const layers = recentPoints ? [...tilesetLayers, makeRecentPointsLayer(recentPoints)] : tilesetLayers
 
   let status = 'waiting for tileset…'
   if (latest) {
