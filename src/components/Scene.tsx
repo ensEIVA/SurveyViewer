@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import DeckGL from '@deck.gl/react'
 import { MapView, type MapViewState } from '@deck.gl/core'
+import type { Tile3DLayerProps } from '@deck.gl/geo-layers'
 import { API_URL, NODE_ENDPOINT_POLL_MS, RECENT_POINTS_POLL_MS, ROOT_NODE_ID, TILESET_POLL_MS } from '../config'
 import { useLiveTileset } from '../hooks/useLiveTileset'
 import { useNodeDescriptionEndpoint } from '../hooks/useNodeDescriptionEndpoint'
@@ -22,6 +23,11 @@ const MAP_VIEW = new MapView({ repeat: true })
 
 const RECENT_POINTS_URL = `${API_URL}/recent-points.bin`
 
+// How often the off-screen tileset is checked for being fully loaded.
+const SWAP_CHECK_MS = 100
+
+type Tileset3D = Parameters<NonNullable<Tile3DLayerProps['onTilesetLoad']>>[0]
+
 // Controlled view state (rather than DeckGL's initialViewState) so the
 // camera can be re-centered from code once a tileset reports where its
 // data actually is.
@@ -32,13 +38,16 @@ export function Scene() {
   const [errorUrl, setErrorUrl] = useState<string | null>(null)
   const [metrics, setMetrics] = useState<DeckMetrics | null>(null)
   const endpoint = useNodeDescriptionEndpoint(ROOT_NODE_ID, NODE_ENDPOINT_POLL_MS)
-  const tilesets = useLiveTileset(endpoint.state === 'ready' ? endpoint.url : null, TILESET_POLL_MS)
-  const latest = tilesets.at(-1)
+  const { front, back, promoteBack } = useLiveTileset(endpoint.state === 'ready' ? endpoint.url : null, TILESET_POLL_MS)
+  // The back slot's loaded Tileset3D, so its readiness can be checked after
+  // every frame. Tagged with its url: a stale one must never be promoted.
+  const [backTileset, setBackTileset] = useState<{ url: string; tileset3d: Tileset3D } | null>(null)
   const recentPoints = useRecentPoints(RECENT_POINTS_URL, RECENT_POINTS_POLL_MS)
 
-  const tilesetLayers = tilesets.map(entry =>
-    makeTilesetLayer(entry, {
+  const makeSlotLayer = (slot: NonNullable<typeof front>, offscreen: boolean) =>
+    makeTilesetLayer(slot, offscreen, {
       onTilesetLoad: tileset3d => {
+        if (offscreen) setBackTileset({ url: slot.url, tileset3d })
         const { cartographicCenter, zoom } = tileset3d
         if (cartographicCenter && !hasCenteredCamera) {
           setHasCenteredCamera(true)
@@ -49,23 +58,43 @@ export function Scene() {
             zoom: Number.isFinite(zoom) ? zoom : vs.zoom,
           }))
         }
-        setLoadedUrl(entry.url)
+        setLoadedUrl(slot.url)
       },
       onTileError: (_tile, tileUrl, message) => {
         console.error('[viewer] tile error', tileUrl, message)
-        setErrorUrl(entry.url)
+        setErrorUrl(slot.url)
       },
-    }),
+    })
+  // Back first, so it's drawn underneath; it's transparent anyway.
+  const tilesetLayers = [back && makeSlotLayer(back, true), front && makeSlotLayer(front, false)].filter(
+    layer => layer !== null,
   )
+
+  // isLoaded(): every tile the current camera needs is in. Polled on a timer
+  // rather than checked in onAfterRender or onTileLoad: isLoaded() only turns
+  // true asynchronously after the last tile lands, and deck.gl only redraws
+  // when something changes — so a redraw-driven check can miss it and leave
+  // the swap (and with it every later poll) stuck until the camera moves.
+  const backTilesetForSwap = back && backTileset?.url === back.url ? backTileset.tileset3d : null
+  useEffect(() => {
+    if (!backTilesetForSwap) return
+    const id = setInterval(() => {
+      if (!backTilesetForSwap.isLoaded()) return
+      setBackTileset(null)
+      promoteBack()
+    }, SWAP_CHECK_MS)
+    return () => clearInterval(id)
+  }, [backTilesetForSwap, promoteBack])
   // Drawn last so it sits on top of the tiles.
   const layers = recentPoints ? [...tilesetLayers, makeRecentPointsLayer(recentPoints)] : tilesetLayers
 
   let status = `asking Nexus for node ${ROOT_NODE_ID}…`
   if (endpoint.state === 'error') status = `Nexus: ${endpoint.message}`
-  else if (latest) {
-    if (errorUrl === latest.url) status = `${latest.label} — tile error, see console`
-    else if (loadedUrl === latest.url) status = `${latest.label} — loaded`
-    else status = `${latest.label} — loading…`
+  else if (front) {
+    if (errorUrl === front.url) status = `${front.label} — tile error, see console`
+    else if (loadedUrl === front.url) status = `${front.label} — loaded`
+    else status = `${front.label} — loading…`
+    if (back) status += ` | next: ${back.label} loading off-screen…`
   }
 
   return (

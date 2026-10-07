@@ -9,8 +9,8 @@ export const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:5007'
 export const ROOT_NODE_ID = '0'
 
 // How often Nexus is asked again for the root's description endpoint.
-export const NODE_ENDPOINT_POLL_MS = 10_00
+export const NODE_ENDPOINT_POLL_MS = 1000
 
-export const TILESET_POLL_MS = 10_000
+export const TILESET_POLL_MS = 5_000
 
-export const RECENT_POINTS_POLL_MS = 1_000
+export const RECENT_POINTS_POLL_MS = 1000
