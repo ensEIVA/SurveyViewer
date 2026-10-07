@@ -1,12 +1,13 @@
 import { useState } from 'react'
 import DeckGL from '@deck.gl/react'
 import { MapView, type MapViewState } from '@deck.gl/core'
-import { API_URL, RECENT_POINTS_POLL_MS, ROOT_NODE_ID, TILESET_POLL_MS } from '../config'
+import { API_URL, NODE_ENDPOINT_POLL_MS, RECENT_POINTS_POLL_MS, ROOT_NODE_ID, TILESET_POLL_MS } from '../config'
 import { useLiveTileset } from '../hooks/useLiveTileset'
 import { useNodeDescriptionEndpoint } from '../hooks/useNodeDescriptionEndpoint'
 import { useRecentPoints } from '../hooks/useRecentPoints'
 import { makeRecentPointsLayer } from '../layers/recentPointsLayer'
 import { makeTilesetLayer } from '../layers/tilesetLayer'
+import { MetricsOverlay, type DeckMetrics } from './MetricsOverlay'
 import { StatusOverlay } from './StatusOverlay'
 
 const INITIAL_VIEW_STATE: MapViewState = {
@@ -29,7 +30,8 @@ export function Scene() {
   const [hasCenteredCamera, setHasCenteredCamera] = useState(false)
   const [loadedUrl, setLoadedUrl] = useState<string | null>(null)
   const [errorUrl, setErrorUrl] = useState<string | null>(null)
-  const endpoint = useNodeDescriptionEndpoint(ROOT_NODE_ID)
+  const [metrics, setMetrics] = useState<DeckMetrics | null>(null)
+  const endpoint = useNodeDescriptionEndpoint(ROOT_NODE_ID, NODE_ENDPOINT_POLL_MS)
   const tilesets = useLiveTileset(endpoint.state === 'ready' ? endpoint.url : null, TILESET_POLL_MS)
   const latest = tilesets.at(-1)
   const recentPoints = useRecentPoints(RECENT_POINTS_URL, RECENT_POINTS_POLL_MS)
@@ -74,8 +76,12 @@ export function Scene() {
         onViewStateChange={({ viewState }) => setViewState(viewState as MapViewState)}
         controller
         layers={layers}
+        // deck.gl mutates one metrics object in place, so copy it — otherwise
+        // React sees the same reference and never re-renders.
+        _onMetrics={m => setMetrics({ ...m })}
       />
       <StatusOverlay text={status} />
+      <MetricsOverlay metrics={metrics} recentPointCount={recentPoints?.count ?? 0} />
     </>
   )
 }

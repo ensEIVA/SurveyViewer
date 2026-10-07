@@ -1,0 +1,24 @@
+.metrics-overlay {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  z-index: 1;
+  margin: 0;
+  font: 12px/1.4 monospace;
+  color: #eee;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 6px 10px;
+  border-radius: 4px;
+  pointer-events: none;
+}
+
+.metrics-overlay div {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.metrics-overlay dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}

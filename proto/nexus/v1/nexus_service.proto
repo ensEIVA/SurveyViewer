@@ -2,13 +2,117 @@ syntax = "proto3";
 package nexus.v1;
 
 service NexusService {
+    // The URL of a node's 3D Tiles tileset JSON, for deck.gl to load. The tileset links to its children's tilesets and
+    // to the node's points, so deck.gl descends the octree from there by itself. Checks the node exists first: fails
+    // with NOT_FOUND for an unknown node, INVALID_ARGUMENT for a malformed id, UNAVAILABLE when Surge cannot be reached.
     rpc GetNodeDescriptionEndpoint(GetNodeDescriptionEndpointRequest) returns (GetNodeDescriptionEndpointResponse);
+
+    // The points Surge ingested most recently (up to 300,000), coloured, plus a clock showing the time they were
+    // fetched. Meant to be polled: each call returns the whole current snapshot. Fails with UNAVAILABLE when Surge
+    // cannot be reached.
+    rpc GetLivePoints(GetLivePointsRequest) returns (GetLivePointsResponse);
+
+    // The ways points can be coloured: which attributes and palettes are available, and the current choice.
+    // NOT YET APPLIED: points are currently always coloured by elevation (Z) on the blue-green-yellow-red palette.
+    rpc GetColorModes(GetColorModesRequest) returns (GetColorModesResponse);
+
+    // Chooses how points are coloured; returns the mode now in effect. Fails with INVALID_ARGUMENT for an attribute or
+    // palette not listed by GetColorModes. The choice is shared by every frontend.
+    // NOT YET APPLIED: the choice is remembered and reported by GetColorModes, but does not change the colouring yet.
+    rpc SetColorMode(SetColorModeRequest) returns (SetColorModeResponse);
 }
 
 message GetNodeDescriptionEndpointRequest {
-    int32 node_id = 1;
+    // A decimal number as a string: ids outgrow 64-bit integers deep in the octree. The root is "0".
+    string node_id = 1;
 }
 
 message GetNodeDescriptionEndpointResponse {
+    // Absolute URL of the node's tileset JSON, e.g. "http://localhost:5007/tileset/node/0.json".
     string node_description_endpoint = 1;
 }
+
+message GetLivePointsRequest {
+    // How to colour the points; optional. Use values listed by GetColorModes.
+    // NOT YET APPLIED: accepted but ignored; points are always coloured by elevation (Z) on blue-green-yellow-red.
+    ColorMode color_mode = 1;
+}
+
+// Positions are in the dataset's local frame: metres East (X), North (Y) and Up (Z) of geo_reference, the same frame
+// the tilesets use. Each point set stores them as float32 offsets from origin, which keeps them small enough for
+// float32 to be precise. In deck.gl: coordinateSystem METER_OFFSETS, coordinateOrigin = [longitude, latitude, height]
+// of geo_reference, modelMatrix = a translation by origin; then the binary arrays can be used directly.
+message GetLivePointsResponse {
+    GeoReference geo_reference = 1;
+    Vector3 origin = 2;
+    // The most recently ingested points, coloured by elevation.
+    PointSet points = 3;
+    // HH:mm:ss drawn in magenta points 30 m above the points; draw it in the same layer or its own.
+    PointSet clock = 4;
+}
+
+message GeoReference {
+    double latitude_degrees = 1;
+    double longitude_degrees = 2;
+    double height_meters = 3;
+}
+
+message Vector3 {
+    double x = 1;
+    double y = 2;
+    double z = 3;
+}
+
+// Binary rather than repeated fields, so a browser can view the bytes as typed arrays instead of decoding hundreds of
+// thousands of numbers one by one.
+message PointSet {
+    uint32 count = 1;
+    // count x 3 little-endian float32: X, Y, Z of each point, relative to GetLivePointsResponse.origin.
+    // As a Float32Array: new Float32Array(positions.slice().buffer).
+    bytes positions = 2;
+    // count x 3 uint8: R, G, B of each point. Usable directly as a Uint8Array.
+    bytes colors = 3;
+}
+
+message GetColorModesRequest {
+}
+
+message GetColorModesResponse {
+    // The point attributes that can be coloured by, e.g. "Z" (elevation) and "Intensity".
+    repeated string attributes = 1;
+    repeated Palette palettes = 2;
+    ColorMode current = 3;
+}
+
+// A gradient, from an attribute's lowest value (the first stop) to its highest (the last), stops evenly spaced.
+message Palette {
+    // Stable identifier, used in ColorMode.palette_id, e.g. "blue-green-yellow-red".
+    string id = 1;
+    // For display in a picker, e.g. "Blue - green - yellow - red".
+    string name = 2;
+    repeated Rgb stops = 3;
+}
+
+message Rgb {
+    // 0-255 each.
+    uint32 r = 1;
+    uint32 g = 2;
+    uint32 b = 3;
+}
+
+message ColorMode {
+    // One of GetColorModesResponse.attributes.
+    string attribute = 1;
+    // One of GetColorModesResponse.palettes' ids.
+    string palette_id = 2;
+}
+
+message SetColorModeRequest {
+    ColorMode color_mode = 1;
+}
+
+message SetColorModeResponse {
+    // The mode now in effect.
+    ColorMode color_mode = 1;
+}
+ 

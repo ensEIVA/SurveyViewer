@@ -9,16 +9,22 @@ export function useRecentPoints(url: string, pollMs: number): RecentPoints | nul
   const [points, setPoints] = useState<RecentPoints | null>(null)
 
   useEffect(() => {
-    const abort = new AbortController()
+    // Unmount marks the loop cancelled instead of aborting the request in
+    // flight: StrictMode mounts, unmounts and remounts every component in
+    // dev, so aborting would cancel the very first request every time. The
+    // request just finishes and its result is dropped.
+    let cancelled = false
     let timer: ReturnType<typeof setTimeout> | undefined
 
     const tick = async () => {
       try {
-        const res = await fetch(url, { cache: 'no-store', signal: abort.signal })
+        const res = await fetch(url, { cache: 'no-store' })
         if (!res.ok) throw new Error(`${res.status} ${res.statusText}`)
-        setPoints(decodeRecentPoints(await res.arrayBuffer()))
+        const buffer = await res.arrayBuffer()
+        if (cancelled) return
+        setPoints(decodeRecentPoints(buffer))
       } catch (err) {
-        if (abort.signal.aborted) return
+        if (cancelled) return
         // Keep showing the last good snapshot; the next tick may recover.
         console.warn('[viewer] recent points poll failed', err)
       }
@@ -27,7 +33,7 @@ export function useRecentPoints(url: string, pollMs: number): RecentPoints | nul
     tick()
 
     return () => {
-      abort.abort()
+      cancelled = true
       clearTimeout(timer)
     }
   }, [url, pollMs])

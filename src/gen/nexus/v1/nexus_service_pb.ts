@@ -10,16 +10,18 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file nexus/v1/nexus_service.proto.
  */
 export const file_nexus_v1_nexus_service: GenFile = /*@__PURE__*/
-  fileDesc("ChxuZXh1cy92MS9uZXh1c19zZXJ2aWNlLnByb3RvEghuZXh1cy52MSI0CiFHZXROb2RlRGVzY3JpcHRpb25FbmRwb2ludFJlcXVlc3QSDwoHbm9kZV9pZBgBIAEoBSJHCiJHZXROb2RlRGVzY3JpcHRpb25FbmRwb2ludFJlc3BvbnNlEiEKGW5vZGVfZGVzY3JpcHRpb25fZW5kcG9pbnQYASABKAkyhwEKDE5leHVzU2VydmljZRJ3ChpHZXROb2RlRGVzY3JpcHRpb25FbmRwb2ludBIrLm5leHVzLnYxLkdldE5vZGVEZXNjcmlwdGlvbkVuZHBvaW50UmVxdWVzdBosLm5leHVzLnYxLkdldE5vZGVEZXNjcmlwdGlvbkVuZHBvaW50UmVzcG9uc2ViBnByb3RvMw");
+  fileDesc("ChxuZXh1cy92MS9uZXh1c19zZXJ2aWNlLnByb3RvEghuZXh1cy52MSI0CiFHZXROb2RlRGVzY3JpcHRpb25FbmRwb2ludFJlcXVlc3QSDwoHbm9kZV9pZBgBIAEoCSJHCiJHZXROb2RlRGVzY3JpcHRpb25FbmRwb2ludFJlc3BvbnNlEiEKGW5vZGVfZGVzY3JpcHRpb25fZW5kcG9pbnQYASABKAkiPwoUR2V0TGl2ZVBvaW50c1JlcXVlc3QSJwoKY29sb3JfbW9kZRgBIAEoCzITLm5leHVzLnYxLkNvbG9yTW9kZSKwAQoVR2V0TGl2ZVBvaW50c1Jlc3BvbnNlEi0KDWdlb19yZWZlcmVuY2UYASABKAsyFi5uZXh1cy52MS5HZW9SZWZlcmVuY2USIQoGb3JpZ2luGAIgASgLMhEubmV4dXMudjEuVmVjdG9yMxIiCgZwb2ludHMYAyABKAsyEi5uZXh1cy52MS5Qb2ludFNldBIhCgVjbG9jaxgEIAEoCzISLm5leHVzLnYxLlBvaW50U2V0IloKDEdlb1JlZmVyZW5jZRIYChBsYXRpdHVkZV9kZWdyZWVzGAEgASgBEhkKEWxvbmdpdHVkZV9kZWdyZWVzGAIgASgBEhUKDWhlaWdodF9tZXRlcnMYAyABKAEiKgoHVmVjdG9yMxIJCgF4GAEgASgBEgkKAXkYAiABKAESCQoBehgDIAEoASI8CghQb2ludFNldBINCgVjb3VudBgBIAEoDRIRCglwb3NpdGlvbnMYAiABKAwSDgoGY29sb3JzGAMgASgMIhYKFEdldENvbG9yTW9kZXNSZXF1ZXN0InYKFUdldENvbG9yTW9kZXNSZXNwb25zZRISCgphdHRyaWJ1dGVzGAEgAygJEiMKCHBhbGV0dGVzGAIgAygLMhEubmV4dXMudjEuUGFsZXR0ZRIkCgdjdXJyZW50GAMgASgLMhMubmV4dXMudjEuQ29sb3JNb2RlIkEKB1BhbGV0dGUSCgoCaWQYASABKAkSDAoEbmFtZRgCIAEoCRIcCgVzdG9wcxgDIAMoCzINLm5leHVzLnYxLlJnYiImCgNSZ2ISCQoBchgBIAEoDRIJCgFnGAIgASgNEgkKAWIYAyABKA0iMgoJQ29sb3JNb2RlEhEKCWF0dHJpYnV0ZRgBIAEoCRISCgpwYWxldHRlX2lkGAIgASgJIj4KE1NldENvbG9yTW9kZVJlcXVlc3QSJwoKY29sb3JfbW9kZRgBIAEoCzITLm5leHVzLnYxLkNvbG9yTW9kZSI/ChRTZXRDb2xvck1vZGVSZXNwb25zZRInCgpjb2xvcl9tb2RlGAEgASgLMhMubmV4dXMudjEuQ29sb3JNb2RlMvoCCgxOZXh1c1NlcnZpY2USdwoaR2V0Tm9kZURlc2NyaXB0aW9uRW5kcG9pbnQSKy5uZXh1cy52MS5HZXROb2RlRGVzY3JpcHRpb25FbmRwb2ludFJlcXVlc3QaLC5uZXh1cy52MS5HZXROb2RlRGVzY3JpcHRpb25FbmRwb2ludFJlc3BvbnNlElAKDUdldExpdmVQb2ludHMSHi5uZXh1cy52MS5HZXRMaXZlUG9pbnRzUmVxdWVzdBofLm5leHVzLnYxLkdldExpdmVQb2ludHNSZXNwb25zZRJQCg1HZXRDb2xvck1vZGVzEh4ubmV4dXMudjEuR2V0Q29sb3JNb2Rlc1JlcXVlc3QaHy5uZXh1cy52MS5HZXRDb2xvck1vZGVzUmVzcG9uc2USTQoMU2V0Q29sb3JNb2RlEh0ubmV4dXMudjEuU2V0Q29sb3JNb2RlUmVxdWVzdBoeLm5leHVzLnYxLlNldENvbG9yTW9kZVJlc3BvbnNlYgZwcm90bzM");
 
 /**
  * @generated from message nexus.v1.GetNodeDescriptionEndpointRequest
  */
 export type GetNodeDescriptionEndpointRequest = Message<"nexus.v1.GetNodeDescriptionEndpointRequest"> & {
   /**
-   * @generated from field: int32 node_id = 1;
+   * A decimal number as a string: ids outgrow 64-bit integers deep in the octree. The root is "0".
+   *
+   * @generated from field: string node_id = 1;
    */
-  nodeId: number;
+  nodeId: string;
 };
 
 /**
@@ -34,6 +36,8 @@ export const GetNodeDescriptionEndpointRequestSchema: GenMessage<GetNodeDescript
  */
 export type GetNodeDescriptionEndpointResponse = Message<"nexus.v1.GetNodeDescriptionEndpointResponse"> & {
   /**
+   * Absolute URL of the node's tileset JSON, e.g. "http://localhost:5007/tileset/node/0.json".
+   *
    * @generated from field: string node_description_endpoint = 1;
    */
   nodeDescriptionEndpoint: string;
@@ -47,16 +51,371 @@ export const GetNodeDescriptionEndpointResponseSchema: GenMessage<GetNodeDescrip
   messageDesc(file_nexus_v1_nexus_service, 1);
 
 /**
+ * @generated from message nexus.v1.GetLivePointsRequest
+ */
+export type GetLivePointsRequest = Message<"nexus.v1.GetLivePointsRequest"> & {
+  /**
+   * How to colour the points; optional. Use values listed by GetColorModes.
+   * NOT YET APPLIED: accepted but ignored; points are always coloured by elevation (Z) on blue-green-yellow-red.
+   *
+   * @generated from field: nexus.v1.ColorMode color_mode = 1;
+   */
+  colorMode?: ColorMode | undefined;
+};
+
+/**
+ * Describes the message nexus.v1.GetLivePointsRequest.
+ * Use `create(GetLivePointsRequestSchema)` to create a new message.
+ */
+export const GetLivePointsRequestSchema: GenMessage<GetLivePointsRequest> = /*@__PURE__*/
+  messageDesc(file_nexus_v1_nexus_service, 2);
+
+/**
+ * Positions are in the dataset's local frame: metres East (X), North (Y) and Up (Z) of geo_reference, the same frame
+ * the tilesets use. Each point set stores them as float32 offsets from origin, which keeps them small enough for
+ * float32 to be precise. In deck.gl: coordinateSystem METER_OFFSETS, coordinateOrigin = [longitude, latitude, height]
+ * of geo_reference, modelMatrix = a translation by origin; then the binary arrays can be used directly.
+ *
+ * @generated from message nexus.v1.GetLivePointsResponse
+ */
+export type GetLivePointsResponse = Message<"nexus.v1.GetLivePointsResponse"> & {
+  /**
+   * @generated from field: nexus.v1.GeoReference geo_reference = 1;
+   */
+  geoReference?: GeoReference | undefined;
+
+  /**
+   * @generated from field: nexus.v1.Vector3 origin = 2;
+   */
+  origin?: Vector3 | undefined;
+
+  /**
+   * The most recently ingested points, coloured by elevation.
+   *
+   * @generated from field: nexus.v1.PointSet points = 3;
+   */
+  points?: PointSet | undefined;
+
+  /**
+   * HH:mm:ss drawn in magenta points 30 m above the points; draw it in the same layer or its own.
+   *
+   * @generated from field: nexus.v1.PointSet clock = 4;
+   */
+  clock?: PointSet | undefined;
+};
+
+/**
+ * Describes the message nexus.v1.GetLivePointsResponse.
+ * Use `create(GetLivePointsResponseSchema)` to create a new message.
+ */
+export const GetLivePointsResponseSchema: GenMessage<GetLivePointsResponse> = /*@__PURE__*/
+  messageDesc(file_nexus_v1_nexus_service, 3);
+
+/**
+ * @generated from message nexus.v1.GeoReference
+ */
+export type GeoReference = Message<"nexus.v1.GeoReference"> & {
+  /**
+   * @generated from field: double latitude_degrees = 1;
+   */
+  latitudeDegrees: number;
+
+  /**
+   * @generated from field: double longitude_degrees = 2;
+   */
+  longitudeDegrees: number;
+
+  /**
+   * @generated from field: double height_meters = 3;
+   */
+  heightMeters: number;
+};
+
+/**
+ * Describes the message nexus.v1.GeoReference.
+ * Use `create(GeoReferenceSchema)` to create a new message.
+ */
+export const GeoReferenceSchema: GenMessage<GeoReference> = /*@__PURE__*/
+  messageDesc(file_nexus_v1_nexus_service, 4);
+
+/**
+ * @generated from message nexus.v1.Vector3
+ */
+export type Vector3 = Message<"nexus.v1.Vector3"> & {
+  /**
+   * @generated from field: double x = 1;
+   */
+  x: number;
+
+  /**
+   * @generated from field: double y = 2;
+   */
+  y: number;
+
+  /**
+   * @generated from field: double z = 3;
+   */
+  z: number;
+};
+
+/**
+ * Describes the message nexus.v1.Vector3.
+ * Use `create(Vector3Schema)` to create a new message.
+ */
+export const Vector3Schema: GenMessage<Vector3> = /*@__PURE__*/
+  messageDesc(file_nexus_v1_nexus_service, 5);
+
+/**
+ * Binary rather than repeated fields, so a browser can view the bytes as typed arrays instead of decoding hundreds of
+ * thousands of numbers one by one.
+ *
+ * @generated from message nexus.v1.PointSet
+ */
+export type PointSet = Message<"nexus.v1.PointSet"> & {
+  /**
+   * @generated from field: uint32 count = 1;
+   */
+  count: number;
+
+  /**
+   * count x 3 little-endian float32: X, Y, Z of each point, relative to GetLivePointsResponse.origin.
+   * As a Float32Array: new Float32Array(positions.slice().buffer).
+   *
+   * @generated from field: bytes positions = 2;
+   */
+  positions: Uint8Array;
+
+  /**
+   * count x 3 uint8: R, G, B of each point. Usable directly as a Uint8Array.
+   *
+   * @generated from field: bytes colors = 3;
+   */
+  colors: Uint8Array;
+};
+
+/**
+ * Describes the message nexus.v1.PointSet.
+ * Use `create(PointSetSchema)` to create a new message.
+ */
+export const PointSetSchema: GenMessage<PointSet> = /*@__PURE__*/
+  messageDesc(file_nexus_v1_nexus_service, 6);
+
+/**
+ * @generated from message nexus.v1.GetColorModesRequest
+ */
+export type GetColorModesRequest = Message<"nexus.v1.GetColorModesRequest"> & {
+};
+
+/**
+ * Describes the message nexus.v1.GetColorModesRequest.
+ * Use `create(GetColorModesRequestSchema)` to create a new message.
+ */
+export const GetColorModesRequestSchema: GenMessage<GetColorModesRequest> = /*@__PURE__*/
+  messageDesc(file_nexus_v1_nexus_service, 7);
+
+/**
+ * @generated from message nexus.v1.GetColorModesResponse
+ */
+export type GetColorModesResponse = Message<"nexus.v1.GetColorModesResponse"> & {
+  /**
+   * The point attributes that can be coloured by, e.g. "Z" (elevation) and "Intensity".
+   *
+   * @generated from field: repeated string attributes = 1;
+   */
+  attributes: string[];
+
+  /**
+   * @generated from field: repeated nexus.v1.Palette palettes = 2;
+   */
+  palettes: Palette[];
+
+  /**
+   * @generated from field: nexus.v1.ColorMode current = 3;
+   */
+  current?: ColorMode | undefined;
+};
+
+/**
+ * Describes the message nexus.v1.GetColorModesResponse.
+ * Use `create(GetColorModesResponseSchema)` to create a new message.
+ */
+export const GetColorModesResponseSchema: GenMessage<GetColorModesResponse> = /*@__PURE__*/
+  messageDesc(file_nexus_v1_nexus_service, 8);
+
+/**
+ * A gradient, from an attribute's lowest value (the first stop) to its highest (the last), stops evenly spaced.
+ *
+ * @generated from message nexus.v1.Palette
+ */
+export type Palette = Message<"nexus.v1.Palette"> & {
+  /**
+   * Stable identifier, used in ColorMode.palette_id, e.g. "blue-green-yellow-red".
+   *
+   * @generated from field: string id = 1;
+   */
+  id: string;
+
+  /**
+   * For display in a picker, e.g. "Blue - green - yellow - red".
+   *
+   * @generated from field: string name = 2;
+   */
+  name: string;
+
+  /**
+   * @generated from field: repeated nexus.v1.Rgb stops = 3;
+   */
+  stops: Rgb[];
+};
+
+/**
+ * Describes the message nexus.v1.Palette.
+ * Use `create(PaletteSchema)` to create a new message.
+ */
+export const PaletteSchema: GenMessage<Palette> = /*@__PURE__*/
+  messageDesc(file_nexus_v1_nexus_service, 9);
+
+/**
+ * @generated from message nexus.v1.Rgb
+ */
+export type Rgb = Message<"nexus.v1.Rgb"> & {
+  /**
+   * 0-255 each.
+   *
+   * @generated from field: uint32 r = 1;
+   */
+  r: number;
+
+  /**
+   * @generated from field: uint32 g = 2;
+   */
+  g: number;
+
+  /**
+   * @generated from field: uint32 b = 3;
+   */
+  b: number;
+};
+
+/**
+ * Describes the message nexus.v1.Rgb.
+ * Use `create(RgbSchema)` to create a new message.
+ */
+export const RgbSchema: GenMessage<Rgb> = /*@__PURE__*/
+  messageDesc(file_nexus_v1_nexus_service, 10);
+
+/**
+ * @generated from message nexus.v1.ColorMode
+ */
+export type ColorMode = Message<"nexus.v1.ColorMode"> & {
+  /**
+   * One of GetColorModesResponse.attributes.
+   *
+   * @generated from field: string attribute = 1;
+   */
+  attribute: string;
+
+  /**
+   * One of GetColorModesResponse.palettes' ids.
+   *
+   * @generated from field: string palette_id = 2;
+   */
+  paletteId: string;
+};
+
+/**
+ * Describes the message nexus.v1.ColorMode.
+ * Use `create(ColorModeSchema)` to create a new message.
+ */
+export const ColorModeSchema: GenMessage<ColorMode> = /*@__PURE__*/
+  messageDesc(file_nexus_v1_nexus_service, 11);
+
+/**
+ * @generated from message nexus.v1.SetColorModeRequest
+ */
+export type SetColorModeRequest = Message<"nexus.v1.SetColorModeRequest"> & {
+  /**
+   * @generated from field: nexus.v1.ColorMode color_mode = 1;
+   */
+  colorMode?: ColorMode | undefined;
+};
+
+/**
+ * Describes the message nexus.v1.SetColorModeRequest.
+ * Use `create(SetColorModeRequestSchema)` to create a new message.
+ */
+export const SetColorModeRequestSchema: GenMessage<SetColorModeRequest> = /*@__PURE__*/
+  messageDesc(file_nexus_v1_nexus_service, 12);
+
+/**
+ * @generated from message nexus.v1.SetColorModeResponse
+ */
+export type SetColorModeResponse = Message<"nexus.v1.SetColorModeResponse"> & {
+  /**
+   * The mode now in effect.
+   *
+   * @generated from field: nexus.v1.ColorMode color_mode = 1;
+   */
+  colorMode?: ColorMode | undefined;
+};
+
+/**
+ * Describes the message nexus.v1.SetColorModeResponse.
+ * Use `create(SetColorModeResponseSchema)` to create a new message.
+ */
+export const SetColorModeResponseSchema: GenMessage<SetColorModeResponse> = /*@__PURE__*/
+  messageDesc(file_nexus_v1_nexus_service, 13);
+
+/**
  * @generated from service nexus.v1.NexusService
  */
 export const NexusService: GenService<{
   /**
+   * The URL of a node's 3D Tiles tileset JSON, for deck.gl to load. The tileset links to its children's tilesets and
+   * to the node's points, so deck.gl descends the octree from there by itself. Checks the node exists first: fails
+   * with NOT_FOUND for an unknown node, INVALID_ARGUMENT for a malformed id, UNAVAILABLE when Surge cannot be reached.
+   *
    * @generated from rpc nexus.v1.NexusService.GetNodeDescriptionEndpoint
    */
   getNodeDescriptionEndpoint: {
     methodKind: "unary";
     input: typeof GetNodeDescriptionEndpointRequestSchema;
     output: typeof GetNodeDescriptionEndpointResponseSchema;
+  },
+  /**
+   * The points Surge ingested most recently (up to 300,000), coloured, plus a clock showing the time they were
+   * fetched. Meant to be polled: each call returns the whole current snapshot. Fails with UNAVAILABLE when Surge
+   * cannot be reached.
+   *
+   * @generated from rpc nexus.v1.NexusService.GetLivePoints
+   */
+  getLivePoints: {
+    methodKind: "unary";
+    input: typeof GetLivePointsRequestSchema;
+    output: typeof GetLivePointsResponseSchema;
+  },
+  /**
+   * The ways points can be coloured: which attributes and palettes are available, and the current choice.
+   * NOT YET APPLIED: points are currently always coloured by elevation (Z) on the blue-green-yellow-red palette.
+   *
+   * @generated from rpc nexus.v1.NexusService.GetColorModes
+   */
+  getColorModes: {
+    methodKind: "unary";
+    input: typeof GetColorModesRequestSchema;
+    output: typeof GetColorModesResponseSchema;
+  },
+  /**
+   * Chooses how points are coloured; returns the mode now in effect. Fails with INVALID_ARGUMENT for an attribute or
+   * palette not listed by GetColorModes. The choice is shared by every frontend.
+   * NOT YET APPLIED: the choice is remembered and reported by GetColorModes, but does not change the colouring yet.
+   *
+   * @generated from rpc nexus.v1.NexusService.SetColorMode
+   */
+  setColorMode: {
+    methodKind: "unary";
+    input: typeof SetColorModeRequestSchema;
+    output: typeof SetColorModeResponseSchema;
   },
 }> = /*@__PURE__*/
   serviceDesc(file_nexus_v1_nexus_service, 0);

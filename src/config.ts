@@ -6,7 +6,10 @@
 export const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:5007'
 
 // Node whose description endpoint (tileset url) is asked for at startup.
-export const ROOT_NODE_ID = 0
+export const ROOT_NODE_ID = '0'
+
+// How often Nexus is asked again for the root's description endpoint.
+export const NODE_ENDPOINT_POLL_MS = 10_00
 
 export const TILESET_POLL_MS = 10_000
 
