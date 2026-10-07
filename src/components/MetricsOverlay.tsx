@@ -6,7 +6,7 @@ export type DeckMetrics = Parameters<NonNullable<DeckProps['_onMetrics']>>[0]
 
 interface Props {
   metrics: DeckMetrics | null
-  recentPointCount: number
+  livePointCount: number
 }
 
 const mb = (bytes: number) => `${(bytes / 1048576).toFixed(1)} MB`
@@ -17,7 +17,7 @@ const ms = (time: number) => (time > 0 ? `${time.toFixed(1)} ms` : 'n/a')
 // Chrome-only, non-standard — undefined elsewhere.
 const jsHeap = () => (performance as Performance & { memory?: { usedJSHeapSize: number } }).memory?.usedJSHeapSize
 
-export function MetricsOverlay({ metrics, recentPointCount }: Props) {
+export function MetricsOverlay({ metrics, livePointCount }: Props) {
   if (!metrics) return null
   const heap = jsHeap()
   const rows: [string, string][] = [
@@ -27,7 +27,7 @@ export function MetricsOverlay({ metrics, recentPointCount }: Props) {
     ['Layers drawn', `${metrics.drawLayersCount} / ${metrics.layersCount}`],
     ['GPU memory', mb(metrics.gpuMemory)],
     ['JS heap', heap === undefined ? 'n/a' : mb(heap)],
-    ['Recent points', recentPointCount.toLocaleString()],
+    ['Live points', livePointCount.toLocaleString()],
   ]
   return (
     <dl className="metrics-overlay">

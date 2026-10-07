@@ -2,11 +2,11 @@ import { useEffect, useState } from 'react'
 import DeckGL from '@deck.gl/react'
 import { MapView, type MapViewState } from '@deck.gl/core'
 import type { Tile3DLayerProps } from '@deck.gl/geo-layers'
-import { API_URL, NODE_ENDPOINT_POLL_MS, RECENT_POINTS_POLL_MS, ROOT_NODE_ID, TILESET_POLL_MS } from '../config'
+import { LIVE_POINTS_POLL_MS, NODE_ENDPOINT_POLL_MS, ROOT_NODE_ID, TILESET_POLL_MS } from '../config'
 import { useLiveTileset } from '../hooks/useLiveTileset'
 import { useNodeDescriptionEndpoint } from '../hooks/useNodeDescriptionEndpoint'
-import { useRecentPoints } from '../hooks/useRecentPoints'
-import { makeRecentPointsLayer } from '../layers/recentPointsLayer'
+import { useLivePoints } from '../hooks/useLivePoints'
+import { makeLivePointsLayers } from '../layers/livePointsLayer'
 import { makeTilesetLayer } from '../layers/tilesetLayer'
 import { MetricsOverlay, type DeckMetrics } from './MetricsOverlay'
 import { StatusOverlay } from './StatusOverlay'
@@ -20,8 +20,6 @@ const INITIAL_VIEW_STATE: MapViewState = {
 }
 
 const MAP_VIEW = new MapView({ repeat: true })
-
-const RECENT_POINTS_URL = `${API_URL}/recent-points.bin`
 
 // How often the off-screen tileset is checked for being fully loaded.
 const SWAP_CHECK_MS = 100
@@ -42,7 +40,7 @@ export function Scene() {
   // The back slot's loaded Tileset3D, so its readiness can be checked after
   // every frame. Tagged with its url: a stale one must never be promoted.
   const [backTileset, setBackTileset] = useState<{ url: string; tileset3d: Tileset3D } | null>(null)
-  const recentPoints = useRecentPoints(RECENT_POINTS_URL, RECENT_POINTS_POLL_MS)
+  const livePoints = useLivePoints(LIVE_POINTS_POLL_MS)
 
   const makeSlotLayer = (slot: NonNullable<typeof front>, offscreen: boolean) =>
     makeTilesetLayer(slot, offscreen, {
@@ -86,7 +84,7 @@ export function Scene() {
     return () => clearInterval(id)
   }, [backTilesetForSwap, promoteBack])
   // Drawn last so it sits on top of the tiles.
-  const layers = recentPoints ? [...tilesetLayers, makeRecentPointsLayer(recentPoints)] : tilesetLayers
+  const layers = livePoints ? [...tilesetLayers, ...makeLivePointsLayers(livePoints)] : tilesetLayers
 
   let status = `asking Nexus for node ${ROOT_NODE_ID}…`
   if (endpoint.state === 'error') status = `Nexus: ${endpoint.message}`
@@ -110,7 +108,7 @@ export function Scene() {
         _onMetrics={m => setMetrics({ ...m })}
       />
       <StatusOverlay text={status} />
-      <MetricsOverlay metrics={metrics} recentPointCount={recentPoints?.count ?? 0} />
+      <MetricsOverlay metrics={metrics} livePointCount={livePoints?.points.count ?? 0} />
     </>
   )
 }

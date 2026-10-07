@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react'
-import { decodeRecentPoints, type RecentPoints } from '../lib/recentPoints'
+import { decodeLivePoints, type LivePoints } from '../lib/livePoints'
+import { nexusClient } from '../services/nexusClient'
 
-// Polls the latest not-yet-in-the-tree points. The next request is only
-// scheduled once the previous one finishes (setTimeout chain, not
-// setInterval): payloads can be several MB, and on a slow link a fixed
+// Polls Nexus for the latest not-yet-in-the-tree points. The next request is
+// only scheduled once the previous one finishes (setTimeout chain, not
+// setInterval): a snapshot can be several MB, and on a slow link a fixed
 // interval would stack up overlapping requests.
-export function useRecentPoints(url: string, pollMs: number): RecentPoints | null {
-  const [points, setPoints] = useState<RecentPoints | null>(null)
+export function useLivePoints(pollMs: number): LivePoints | null {
+  const [points, setPoints] = useState<LivePoints | null>(null)
 
   useEffect(() => {
     // Unmount marks the loop cancelled instead of aborting the request in
@@ -18,15 +19,14 @@ export function useRecentPoints(url: string, pollMs: number): RecentPoints | nul
 
     const tick = async () => {
       try {
-        const res = await fetch(url, { cache: 'no-store' })
-        if (!res.ok) throw new Error(`${res.status} ${res.statusText}`)
-        const buffer = await res.arrayBuffer()
+        const res = await nexusClient.getLivePoints({})
+        console.log('[viewer] Got live points response', res)
         if (cancelled) return
-        setPoints(decodeRecentPoints(buffer))
+        setPoints(decodeLivePoints(res))
       } catch (err) {
         if (cancelled) return
         // Keep showing the last good snapshot; the next tick may recover.
-        console.warn('[viewer] recent points poll failed', err)
+        console.warn('[viewer] GetLivePoints failed', err)
       }
       timer = setTimeout(tick, pollMs)
     }
@@ -36,7 +36,7 @@ export function useRecentPoints(url: string, pollMs: number): RecentPoints | nul
       cancelled = true
       clearTimeout(timer)
     }
-  }, [url, pollMs])
+  }, [pollMs])
 
   return points
 }
