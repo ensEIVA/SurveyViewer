@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 // One of the two Tile3DLayers the double buffer alternates between. The id
 // is the layer's identity; the url is what it's currently loading/showing.
@@ -16,8 +16,6 @@ export interface LiveTileset {
   // Call once the back slot's view is fully loaded: it becomes the front,
   // and the old front is dropped, freeing its slot for the next poll.
   promoteBack: () => void
-  // Load the tileset again now, without waiting for the next poll.
-  refresh: () => void
 }
 
 type Slots = { front: TilesetSlot | null; back: TilesetSlot | null }
@@ -48,7 +46,11 @@ function loadNext(prev: Slots, tilesetUrl: string, force: boolean): Slots {
 // tileset. A poll is skipped while the back slot is still loading: polling
 // faster than a tileset can load would otherwise restart it forever and
 // nothing would ever be promoted. A null url (not known yet) means don't poll.
-export function useLiveTileset(tilesetUrl: string | null, pollMs: number): LiveTileset {
+//
+// `refreshKey`: whenever it changes, load the tileset again now instead of
+// waiting for the next poll — e.g. a colour change, which only shows in
+// freshly fetched tiles.
+export function useLiveTileset(tilesetUrl: string | null, pollMs: number, refreshKey: unknown): LiveTileset {
   const [slots, setSlots] = useState<Slots>({ front: null, back: null })
 
   useEffect(() => {
@@ -63,9 +65,13 @@ export function useLiveTileset(tilesetUrl: string | null, pollMs: number): LiveT
     setSlots(prev => (prev.back ? { front: prev.back, back: null } : prev))
   }, [])
 
-  const refresh = useCallback(() => {
-    if (tilesetUrl) setSlots(prev => loadNext(prev, tilesetUrl, true))
-  }, [tilesetUrl])
+  // Skips the initial key: mounting already loads via the poll effect.
+  const lastRefreshKey = useRef(refreshKey)
+  useEffect(() => {
+    if (lastRefreshKey.current === refreshKey || !tilesetUrl) return
+    lastRefreshKey.current = refreshKey
+    setSlots(prev => loadNext(prev, tilesetUrl, true))
+  }, [refreshKey, tilesetUrl])
 
-  return { ...slots, promoteBack, refresh }
+  return { ...slots, promoteBack }
 }

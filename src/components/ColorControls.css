@@ -1,8 +1,4 @@
 .color-controls {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  z-index: 1;
   display: flex;
   gap: 8px;
   align-items: center;

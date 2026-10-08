@@ -1,15 +1,13 @@
-.dataset-picker {
+.camera-overlay {
   position: absolute;
   bottom: 8px;
   left: 8px;
   z-index: 1;
   font: 12px/1.4 monospace;
+  font-variant-numeric: tabular-nums;
   color: #eee;
   background: rgba(0, 0, 0, 0.5);
   padding: 6px 10px;
   border-radius: 4px;
-}
-
-.dataset-picker select {
-  font: inherit;
+  pointer-events: none;
 }

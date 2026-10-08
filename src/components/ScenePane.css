@@ -1,0 +1,43 @@
+.scene-pane {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  background: #111;
+}
+
+.scene-pane-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  padding: 4px 8px;
+  font: 12px/1.4 monospace;
+  color: #eee;
+  background: #1b1b1b;
+}
+
+.scene-pane-header select,
+.scene-pane-header button {
+  font: inherit;
+}
+
+.scene-pane-source {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  padding: 2px 6px;
+  border: 1px solid #333;
+  border-radius: 3px;
+}
+
+.scene-pane-close {
+  margin-left: auto;
+}
+
+/* DeckGL and the overlays are absolutely positioned: this is their box. */
+.scene-pane-body {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+}

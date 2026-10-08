@@ -9,4 +9,6 @@
   padding: 6px 10px;
   border-radius: 4px;
   pointer-events: none;
+  /* One line per dataset in the scene. */
+  white-space: pre-line;
 }

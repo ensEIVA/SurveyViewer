@@ -1,0 +1,31 @@
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.app-toolbar {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 4px 8px;
+  font: 12px/1.4 monospace;
+  color: #eee;
+  background: #222;
+}
+
+.app-toolbar button {
+  font: inherit;
+}
+
+/* As many columns as fit at a usable width; extra panes wrap onto new rows,
+   which share the height evenly. */
+.scene-grid {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+  grid-auto-rows: 1fr;
+  gap: 2px;
+  background: #333;
+}

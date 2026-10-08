@@ -31,11 +31,14 @@ const sleep = (ms: number, signal: AbortSignal) =>
 // held connection, and leaving it running would leak one per remount. In dev,
 // StrictMode's mount-unmount-remount therefore opens and immediately cancels a
 // first stream — Nexus has to tolerate that, as it must any closed tab.
-export function useLivePoints(datasetId: string): LivePointsStream {
+// `enabled: false` closes the stream (or never opens it): a pane without live
+// points holds no connection and receives nothing.
+export function useLivePoints(datasetId: string, enabled: boolean): LivePointsStream {
   const [points, setPoints] = useState<LivePoints | null>(null)
   const [connected, setConnected] = useState(false)
 
   useEffect(() => {
+    if (!enabled) return
     const abort = new AbortController()
     const { signal } = abort
 
@@ -62,7 +65,8 @@ export function useLivePoints(datasetId: string): LivePointsStream {
     run()
 
     return () => abort.abort()
-  }, [datasetId])
+  }, [datasetId, enabled])
 
-  return { points, connected }
+  // Hide the last snapshot while switched off rather than clearing state.
+  return enabled ? { points, connected } : { points: null, connected: false }
 }

@@ -23,7 +23,11 @@ function makePointSetLayer(id: string, set: DecodedPointSet, { coordinateOrigin,
 }
 
 // The live points and the clock Nexus draws above them, as two layers in the
-// same frame.
-export function makeLivePointsLayers(live: LivePoints) {
-  return [makePointSetLayer('live-points', live.points, live), makePointSetLayer('live-clock', live.clock, live)]
+// same frame. `datasetId` keeps layer ids unique when several datasets share a
+// scene.
+export function makeLivePointsLayers(datasetId: string, live: LivePoints) {
+  return [
+    makePointSetLayer(`live-points-${datasetId}`, live.points, live),
+    makePointSetLayer(`live-clock-${datasetId}`, live.clock, live),
+  ]
 }
