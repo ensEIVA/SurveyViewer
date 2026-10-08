@@ -12,7 +12,7 @@ export type NodeDescriptionEndpoint =
 // setTimeout chain rather than setInterval: the next request is only
 // scheduled once the previous one has finished, so a slow Nexus never has
 // overlapping calls stacked up.
-export function useNodeDescriptionEndpoint(nodeId: string, pollMs: number): NodeDescriptionEndpoint {
+export function useNodeDescriptionEndpoint(datasetId: string, nodeId: string, pollMs: number): NodeDescriptionEndpoint {
   const [result, setResult] = useState<NodeDescriptionEndpoint>({ state: 'loading' })
   useEffect(() => {
     // Unmount marks the loop cancelled instead of aborting the request in
@@ -24,12 +24,12 @@ export function useNodeDescriptionEndpoint(nodeId: string, pollMs: number): Node
 
     const tick = async () => {
       try {
-        const res = await nexusClient.getNodeDescriptionEndpoint({ nodeId })
+        const res = await nexusClient.getNodeDescriptionEndpoint({ datasetId, nodeId })
         // Resolved against Nexus's own url, so a relative endpoint
         // ("/tileset.json") works as well as an absolute one.
         if (cancelled) return
         const url = new URL(res.nodeDescriptionEndpoint, API_URL).toString()
-        console.log('[viewer] Nexus node description endpoint', { nodeId, raw: res.nodeDescriptionEndpoint, url })
+        console.log('[viewer] Nexus node description endpoint', { datasetId, nodeId, raw: res.nodeDescriptionEndpoint, url })
         // Same url as last time → keep the same object, so nothing
         // downstream re-renders or restarts its tileset polling.
         setResult(prev => (prev.state === 'ready' && prev.url === url ? prev : { state: 'ready', url }))
@@ -52,7 +52,7 @@ export function useNodeDescriptionEndpoint(nodeId: string, pollMs: number): Node
       cancelled = true
       clearTimeout(timer)
     }
-  }, [nodeId, pollMs])
+  }, [datasetId, nodeId, pollMs])
 
   return result
 }

@@ -28,21 +28,24 @@ const SWAP_CHECK_MS = 100
 
 type Tileset3D = Parameters<NonNullable<Tile3DLayerProps['onTilesetLoad']>>[0]
 
+// One dataset's scene. Mounted with key={datasetId} by App, so switching
+// dataset starts every hook here over: tileset, live stream, camera.
+//
 // Controlled view state (rather than DeckGL's initialViewState) so the
 // camera can be re-centered from code once a tileset reports where its
 // data actually is.
-export function Scene() {
+export function Scene({ datasetId }: { datasetId: string }) {
   const [viewState, setViewState] = useState<MapViewState>(INITIAL_VIEW_STATE)
   const [hasCenteredCamera, setHasCenteredCamera] = useState(false)
   const [loadedUrl, setLoadedUrl] = useState<string | null>(null)
   const [errorUrl, setErrorUrl] = useState<string | null>(null)
   const [metrics, setMetrics] = useState<DeckMetrics | null>(null)
-  const endpoint = useNodeDescriptionEndpoint(ROOT_NODE_ID, NODE_ENDPOINT_POLL_MS)
+  const endpoint = useNodeDescriptionEndpoint(datasetId, ROOT_NODE_ID, NODE_ENDPOINT_POLL_MS)
   const { front, back, promoteBack, refresh: refreshTileset } = useLiveTileset(endpoint.state === 'ready' ? endpoint.url : null, TILESET_POLL_MS)
   // The back slot's loaded Tileset3D, so its readiness can be checked after
   // every frame. Tagged with its url: a stale one must never be promoted.
   const [backTileset, setBackTileset] = useState<{ url: string; tileset3d: Tileset3D } | null>(null)
-  const { points: livePoints, connected: liveConnected } = useLivePoints()
+  const { points: livePoints, connected: liveConnected } = useLivePoints(datasetId)
   const colorModes = useColorModes()
 
   const makeSlotLayer = (slot: NonNullable<typeof front>, offscreen: boolean) =>

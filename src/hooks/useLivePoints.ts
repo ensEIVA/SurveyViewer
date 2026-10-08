@@ -31,7 +31,7 @@ const sleep = (ms: number, signal: AbortSignal) =>
 // held connection, and leaving it running would leak one per remount. In dev,
 // StrictMode's mount-unmount-remount therefore opens and immediately cancels a
 // first stream — Nexus has to tolerate that, as it must any closed tab.
-export function useLivePoints(): LivePointsStream {
+export function useLivePoints(datasetId: string): LivePointsStream {
   const [points, setPoints] = useState<LivePoints | null>(null)
   const [connected, setConnected] = useState(false)
 
@@ -43,7 +43,7 @@ export function useLivePoints(): LivePointsStream {
       let delay = RECONNECT_MIN_MS
       while (!signal.aborted) {
         try {
-          for await (const res of nexusClient.getLivePoints({}, { signal })) {
+          for await (const res of nexusClient.getLivePoints({ datasetId }, { signal })) {
             setPoints(decodeLivePoints(res))
             setConnected(true)
             delay = RECONNECT_MIN_MS
@@ -62,7 +62,7 @@ export function useLivePoints(): LivePointsStream {
     run()
 
     return () => abort.abort()
-  }, [])
+  }, [datasetId])
 
   return { points, connected }
 }
