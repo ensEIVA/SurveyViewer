@@ -1,0 +1,28 @@
+.color-controls {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 1;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font: 12px/1.4 monospace;
+  color: #eee;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 6px 10px;
+  border-radius: 4px;
+}
+
+.color-controls select {
+  font: inherit;
+}
+
+.color-controls-swatch {
+  width: 64px;
+  height: 10px;
+  border-radius: 2px;
+}
+
+.color-controls-error {
+  color: #f88;
+}

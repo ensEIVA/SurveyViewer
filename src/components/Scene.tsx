@@ -3,11 +3,13 @@ import DeckGL from '@deck.gl/react'
 import { MapView, type MapViewState } from '@deck.gl/core'
 import type { Tile3DLayerProps } from '@deck.gl/geo-layers'
 import { LIVE_POINTS_POLL_MS, NODE_ENDPOINT_POLL_MS, ROOT_NODE_ID, TILESET_POLL_MS } from '../config'
+import { useColorModes } from '../hooks/useColorModes'
 import { useLiveTileset } from '../hooks/useLiveTileset'
 import { useNodeDescriptionEndpoint } from '../hooks/useNodeDescriptionEndpoint'
 import { useLivePoints } from '../hooks/useLivePoints'
 import { makeLivePointsLayers } from '../layers/livePointsLayer'
 import { makeTilesetLayer } from '../layers/tilesetLayer'
+import { ColorControls } from './ColorControls'
 import { MetricsOverlay, type DeckMetrics } from './MetricsOverlay'
 import { StatusOverlay } from './StatusOverlay'
 
@@ -36,11 +38,12 @@ export function Scene() {
   const [errorUrl, setErrorUrl] = useState<string | null>(null)
   const [metrics, setMetrics] = useState<DeckMetrics | null>(null)
   const endpoint = useNodeDescriptionEndpoint(ROOT_NODE_ID, NODE_ENDPOINT_POLL_MS)
-  const { front, back, promoteBack } = useLiveTileset(endpoint.state === 'ready' ? endpoint.url : null, TILESET_POLL_MS)
+  const { front, back, promoteBack, refresh: refreshTileset } = useLiveTileset(endpoint.state === 'ready' ? endpoint.url : null, TILESET_POLL_MS)
   // The back slot's loaded Tileset3D, so its readiness can be checked after
   // every frame. Tagged with its url: a stale one must never be promoted.
   const [backTileset, setBackTileset] = useState<{ url: string; tileset3d: Tileset3D } | null>(null)
   const livePoints = useLivePoints(LIVE_POINTS_POLL_MS)
+  const colorModes = useColorModes()
 
   const makeSlotLayer = (slot: NonNullable<typeof front>, offscreen: boolean) =>
     makeTilesetLayer(slot, offscreen, {
@@ -108,6 +111,9 @@ export function Scene() {
         _onMetrics={m => setMetrics({ ...m })}
       />
       <StatusOverlay text={status} />
+      {/* Tiles are coloured by Nexus, so a new choice needs a tileset reload
+          to show; live points pick it up on their next poll anyway. */}
+      <ColorControls modes={colorModes} onChanged={refreshTileset} />
       <MetricsOverlay metrics={metrics} livePointCount={livePoints?.points.count ?? 0} />
     </>
   )

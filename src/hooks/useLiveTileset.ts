@@ -16,9 +16,29 @@ export interface LiveTileset {
   // Call once the back slot's view is fully loaded: it becomes the front,
   // and the old front is dropped, freeing its slot for the next poll.
   promoteBack: () => void
+  // Load the tileset again now, without waiting for the next poll.
+  refresh: () => void
 }
 
+type Slots = { front: TilesetSlot | null; back: TilesetSlot | null }
+
 const otherSlot = (id: TilesetSlot['id']) => (id === 'a' ? 'b' : 'a')
+
+// Next slot state after a poll. `force` (an explicit refresh, e.g. after a
+// colour change) replaces a back slot still loading the previous poll —
+// that one would show stale data — instead of skipping.
+function loadNext(prev: Slots, tilesetUrl: string, force: boolean): Slots {
+  if (prev.back && !force) return prev
+  const url = new URL(tilesetUrl)
+  url.searchParams.set('t', String(Date.now()))
+  const label = `live @ ${new Date().toLocaleTimeString()}`
+  // First load: nothing to hide behind, so show it progressively.
+  if (!prev.front) return { front: { id: 'a', url: url.toString(), label }, back: null }
+  // Two ticks in the same millisecond (StrictMode runs the poll effect
+  // twice in dev) would produce the same url — skip the duplicate.
+  if (prev.front.url === url.toString() || prev.back?.url === url.toString()) return prev
+  return { ...prev, back: { id: otherSlot(prev.front.id), url: url.toString(), label } }
+}
 
 // Double-buffered live tileset. The backend regenerates tileset.json on
 // every request at the same url, but Tile3DLayer keys its loaded state off
@@ -29,27 +49,11 @@ const otherSlot = (id: TilesetSlot['id']) => (id === 'a' ? 'b' : 'a')
 // faster than a tileset can load would otherwise restart it forever and
 // nothing would ever be promoted. A null url (not known yet) means don't poll.
 export function useLiveTileset(tilesetUrl: string | null, pollMs: number): LiveTileset {
-  const [slots, setSlots] = useState<{ front: TilesetSlot | null; back: TilesetSlot | null }>({
-    front: null,
-    back: null,
-  })
+  const [slots, setSlots] = useState<Slots>({ front: null, back: null })
 
   useEffect(() => {
     if (!tilesetUrl) return
-    const tick = () => {
-      const url = new URL(tilesetUrl)
-      url.searchParams.set('t', String(Date.now()))
-      const label = `live @ ${new Date().toLocaleTimeString()}`
-      setSlots(prev => {
-        if (prev.back) return prev
-        // First load: nothing to hide behind, so show it progressively.
-        if (!prev.front) return { front: { id: 'a', url: url.toString(), label }, back: null }
-        // Two ticks in the same millisecond (StrictMode runs this effect
-        // twice in dev) would produce the same url — skip the duplicate.
-        if (prev.front.url === url.toString()) return prev
-        return { ...prev, back: { id: otherSlot(prev.front.id), url: url.toString(), label } }
-      })
-    }
+    const tick = () => setSlots(prev => loadNext(prev, tilesetUrl, false))
     tick()
     const id = setInterval(tick, pollMs)
     return () => clearInterval(id)
@@ -59,5 +63,9 @@ export function useLiveTileset(tilesetUrl: string | null, pollMs: number): LiveT
     setSlots(prev => (prev.back ? { front: prev.back, back: null } : prev))
   }, [])
 
-  return { ...slots, promoteBack }
+  const refresh = useCallback(() => {
+    if (tilesetUrl) setSlots(prev => loadNext(prev, tilesetUrl, true))
+  }, [tilesetUrl])
+
+  return { ...slots, promoteBack, refresh }
 }
