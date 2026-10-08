@@ -12,5 +12,3 @@ export const ROOT_NODE_ID = '0'
 export const NODE_ENDPOINT_POLL_MS = 10000
 
 export const TILESET_POLL_MS = 5_000
-
-export const LIVE_POINTS_POLL_MS = 100

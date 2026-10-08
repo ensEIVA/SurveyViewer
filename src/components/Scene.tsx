@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import DeckGL from '@deck.gl/react'
 import { MapView, type MapViewState } from '@deck.gl/core'
 import type { Tile3DLayerProps } from '@deck.gl/geo-layers'
-import { LIVE_POINTS_POLL_MS, NODE_ENDPOINT_POLL_MS, ROOT_NODE_ID, TILESET_POLL_MS } from '../config'
+import { NODE_ENDPOINT_POLL_MS, ROOT_NODE_ID, TILESET_POLL_MS } from '../config'
 import { useColorModes } from '../hooks/useColorModes'
 import { useLiveTileset } from '../hooks/useLiveTileset'
 import { useNodeDescriptionEndpoint } from '../hooks/useNodeDescriptionEndpoint'
@@ -42,7 +42,7 @@ export function Scene() {
   // The back slot's loaded Tileset3D, so its readiness can be checked after
   // every frame. Tagged with its url: a stale one must never be promoted.
   const [backTileset, setBackTileset] = useState<{ url: string; tileset3d: Tileset3D } | null>(null)
-  const livePoints = useLivePoints(LIVE_POINTS_POLL_MS)
+  const { points: livePoints, connected: liveConnected } = useLivePoints()
   const colorModes = useColorModes()
 
   const makeSlotLayer = (slot: NonNullable<typeof front>, offscreen: boolean) =>
@@ -97,6 +97,7 @@ export function Scene() {
     else status = `${front.label} — loading…`
     if (back) status += ` | next: ${back.label} loading off-screen…`
   }
+  if (livePoints && !liveConnected) status += ' | live points: reconnecting…'
 
   return (
     <>

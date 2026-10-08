@@ -10,7 +10,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file nexus/v1/nexus_service.proto.
  */
 export const file_nexus_v1_nexus_service: GenFile = /*@__PURE__*/
-  fileDesc("ChxuZXh1cy92MS9uZXh1c19zZXJ2aWNlLnByb3RvEghuZXh1cy52MSI0CiFHZXROb2RlRGVzY3JpcHRpb25FbmRwb2ludFJlcXVlc3QSDwoHbm9kZV9pZBgBIAEoCSJHCiJHZXROb2RlRGVzY3JpcHRpb25FbmRwb2ludFJlc3BvbnNlEiEKGW5vZGVfZGVzY3JpcHRpb25fZW5kcG9pbnQYASABKAkiPwoUR2V0TGl2ZVBvaW50c1JlcXVlc3QSJwoKY29sb3JfbW9kZRgBIAEoCzITLm5leHVzLnYxLkNvbG9yTW9kZSKwAQoVR2V0TGl2ZVBvaW50c1Jlc3BvbnNlEi0KDWdlb19yZWZlcmVuY2UYASABKAsyFi5uZXh1cy52MS5HZW9SZWZlcmVuY2USIQoGb3JpZ2luGAIgASgLMhEubmV4dXMudjEuVmVjdG9yMxIiCgZwb2ludHMYAyABKAsyEi5uZXh1cy52MS5Qb2ludFNldBIhCgVjbG9jaxgEIAEoCzISLm5leHVzLnYxLlBvaW50U2V0IloKDEdlb1JlZmVyZW5jZRIYChBsYXRpdHVkZV9kZWdyZWVzGAEgASgBEhkKEWxvbmdpdHVkZV9kZWdyZWVzGAIgASgBEhUKDWhlaWdodF9tZXRlcnMYAyABKAEiKgoHVmVjdG9yMxIJCgF4GAEgASgBEgkKAXkYAiABKAESCQoBehgDIAEoASI8CghQb2ludFNldBINCgVjb3VudBgBIAEoDRIRCglwb3NpdGlvbnMYAiABKAwSDgoGY29sb3JzGAMgASgMIhYKFEdldENvbG9yTW9kZXNSZXF1ZXN0InYKFUdldENvbG9yTW9kZXNSZXNwb25zZRISCgphdHRyaWJ1dGVzGAEgAygJEiMKCHBhbGV0dGVzGAIgAygLMhEubmV4dXMudjEuUGFsZXR0ZRIkCgdjdXJyZW50GAMgASgLMhMubmV4dXMudjEuQ29sb3JNb2RlIkEKB1BhbGV0dGUSCgoCaWQYASABKAkSDAoEbmFtZRgCIAEoCRIcCgVzdG9wcxgDIAMoCzINLm5leHVzLnYxLlJnYiImCgNSZ2ISCQoBchgBIAEoDRIJCgFnGAIgASgNEgkKAWIYAyABKA0iNwoJQ29sb3JNb2RlEhYKDmF0dHJpYnV0ZV9uYW1lGAEgASgJEhIKCnBhbGV0dGVfaWQYAiABKAkiPgoTU2V0Q29sb3JNb2RlUmVxdWVzdBInCgpjb2xvcl9tb2RlGAEgASgLMhMubmV4dXMudjEuQ29sb3JNb2RlIj8KFFNldENvbG9yTW9kZVJlc3BvbnNlEicKCmNvbG9yX21vZGUYASABKAsyEy5uZXh1cy52MS5Db2xvck1vZGUy+gIKDE5leHVzU2VydmljZRJ3ChpHZXROb2RlRGVzY3JpcHRpb25FbmRwb2ludBIrLm5leHVzLnYxLkdldE5vZGVEZXNjcmlwdGlvbkVuZHBvaW50UmVxdWVzdBosLm5leHVzLnYxLkdldE5vZGVEZXNjcmlwdGlvbkVuZHBvaW50UmVzcG9uc2USUAoNR2V0TGl2ZVBvaW50cxIeLm5leHVzLnYxLkdldExpdmVQb2ludHNSZXF1ZXN0Gh8ubmV4dXMudjEuR2V0TGl2ZVBvaW50c1Jlc3BvbnNlElAKDUdldENvbG9yTW9kZXMSHi5uZXh1cy52MS5HZXRDb2xvck1vZGVzUmVxdWVzdBofLm5leHVzLnYxLkdldENvbG9yTW9kZXNSZXNwb25zZRJNCgxTZXRDb2xvck1vZGUSHS5uZXh1cy52MS5TZXRDb2xvck1vZGVSZXF1ZXN0Gh4ubmV4dXMudjEuU2V0Q29sb3JNb2RlUmVzcG9uc2ViBnByb3RvMw");
+  fileDesc("ChxuZXh1cy92MS9uZXh1c19zZXJ2aWNlLnByb3RvEghuZXh1cy52MSI0CiFHZXROb2RlRGVzY3JpcHRpb25FbmRwb2ludFJlcXVlc3QSDwoHbm9kZV9pZBgBIAEoCSJHCiJHZXROb2RlRGVzY3JpcHRpb25FbmRwb2ludFJlc3BvbnNlEiEKGW5vZGVfZGVzY3JpcHRpb25fZW5kcG9pbnQYASABKAkiPwoUR2V0TGl2ZVBvaW50c1JlcXVlc3QSJwoKY29sb3JfbW9kZRgBIAEoCzITLm5leHVzLnYxLkNvbG9yTW9kZSKwAQoVR2V0TGl2ZVBvaW50c1Jlc3BvbnNlEi0KDWdlb19yZWZlcmVuY2UYASABKAsyFi5uZXh1cy52MS5HZW9SZWZlcmVuY2USIQoGb3JpZ2luGAIgASgLMhEubmV4dXMudjEuVmVjdG9yMxIiCgZwb2ludHMYAyABKAsyEi5uZXh1cy52MS5Qb2ludFNldBIhCgVjbG9jaxgEIAEoCzISLm5leHVzLnYxLlBvaW50U2V0IloKDEdlb1JlZmVyZW5jZRIYChBsYXRpdHVkZV9kZWdyZWVzGAEgASgBEhkKEWxvbmdpdHVkZV9kZWdyZWVzGAIgASgBEhUKDWhlaWdodF9tZXRlcnMYAyABKAEiKgoHVmVjdG9yMxIJCgF4GAEgASgBEgkKAXkYAiABKAESCQoBehgDIAEoASI8CghQb2ludFNldBINCgVjb3VudBgBIAEoDRIRCglwb3NpdGlvbnMYAiABKAwSDgoGY29sb3JzGAMgASgMIhYKFEdldENvbG9yTW9kZXNSZXF1ZXN0InYKFUdldENvbG9yTW9kZXNSZXNwb25zZRISCgphdHRyaWJ1dGVzGAEgAygJEiMKCHBhbGV0dGVzGAIgAygLMhEubmV4dXMudjEuUGFsZXR0ZRIkCgdjdXJyZW50GAMgASgLMhMubmV4dXMudjEuQ29sb3JNb2RlIkEKB1BhbGV0dGUSCgoCaWQYASABKAkSDAoEbmFtZRgCIAEoCRIcCgVzdG9wcxgDIAMoCzINLm5leHVzLnYxLlJnYiImCgNSZ2ISCQoBchgBIAEoDRIJCgFnGAIgASgNEgkKAWIYAyABKA0iNwoJQ29sb3JNb2RlEhYKDmF0dHJpYnV0ZV9uYW1lGAEgASgJEhIKCnBhbGV0dGVfaWQYAiABKAkiPgoTU2V0Q29sb3JNb2RlUmVxdWVzdBInCgpjb2xvcl9tb2RlGAEgASgLMhMubmV4dXMudjEuQ29sb3JNb2RlIj8KFFNldENvbG9yTW9kZVJlc3BvbnNlEicKCmNvbG9yX21vZGUYASABKAsyEy5uZXh1cy52MS5Db2xvck1vZGUy/AIKDE5leHVzU2VydmljZRJ3ChpHZXROb2RlRGVzY3JpcHRpb25FbmRwb2ludBIrLm5leHVzLnYxLkdldE5vZGVEZXNjcmlwdGlvbkVuZHBvaW50UmVxdWVzdBosLm5leHVzLnYxLkdldE5vZGVEZXNjcmlwdGlvbkVuZHBvaW50UmVzcG9uc2USUgoNR2V0TGl2ZVBvaW50cxIeLm5leHVzLnYxLkdldExpdmVQb2ludHNSZXF1ZXN0Gh8ubmV4dXMudjEuR2V0TGl2ZVBvaW50c1Jlc3BvbnNlMAESUAoNR2V0Q29sb3JNb2RlcxIeLm5leHVzLnYxLkdldENvbG9yTW9kZXNSZXF1ZXN0Gh8ubmV4dXMudjEuR2V0Q29sb3JNb2Rlc1Jlc3BvbnNlEk0KDFNldENvbG9yTW9kZRIdLm5leHVzLnYxLlNldENvbG9yTW9kZVJlcXVlc3QaHi5uZXh1cy52MS5TZXRDb2xvck1vZGVSZXNwb25zZWIGcHJvdG8z");
 
 /**
  * @generated from message nexus.v1.GetNodeDescriptionEndpointRequest
@@ -55,8 +55,8 @@ export const GetNodeDescriptionEndpointResponseSchema: GenMessage<GetNodeDescrip
  */
 export type GetLivePointsRequest = Message<"nexus.v1.GetLivePointsRequest"> & {
   /**
-   * How to colour the points; optional. Use values listed by GetColorModes.
-   * NOT YET APPLIED: accepted but ignored; points are always coloured by elevation (Z) on blue-green-yellow-red.
+   * IGNORED: points are coloured with the mode set through SetColorMode, shared by every frontend. Kept so a request
+   * that sets it still works; it may be removed.
    *
    * @generated from field: nexus.v1.ColorMode color_mode = 1;
    */
@@ -90,7 +90,7 @@ export type GetLivePointsResponse = Message<"nexus.v1.GetLivePointsResponse"> & 
   origin?: Vector3 | undefined;
 
   /**
-   * The most recently ingested points, coloured by elevation.
+   * The most recently ingested points, coloured with the current colour mode (see SetColorMode).
    *
    * @generated from field: nexus.v1.PointSet points = 3;
    */
@@ -384,21 +384,22 @@ export const NexusService: GenService<{
     output: typeof GetNodeDescriptionEndpointResponseSchema;
   },
   /**
-   * The points Surge ingested most recently (up to 300,000), coloured, plus a clock showing the time they were
-   * fetched. Meant to be polled: each call returns the whole current snapshot. Fails with UNAVAILABLE when Surge
-   * cannot be reached.
+   * A stream of snapshots of the points Surge ingested most recently (up to 300,000 each), coloured, plus a clock
+   * showing when each was taken. Open it once and keep reading: Nexus sends the latest snapshot straight away, then a
+   * new one every interval (one second by default) until the frontend closes the stream. Every frontend gets the
+   * same snapshots; one that reads slowly skips to the newest rather than falling behind. While Surge cannot be
+   * reached the stream stays open and simply sends nothing new.
    *
    * @generated from rpc nexus.v1.NexusService.GetLivePoints
    */
   getLivePoints: {
-    methodKind: "unary";
+    methodKind: "server_streaming";
     input: typeof GetLivePointsRequestSchema;
     output: typeof GetLivePointsResponseSchema;
   },
   /**
    * The ways points can be coloured: which attributes and palettes are available, and the current choice. Fails with
    * UNAVAILABLE when Surge, which lists the attributes, cannot be reached.
-   * NOT YET APPLIED: points are currently always coloured by elevation (Z) on the blue-green-yellow-red palette.
    *
    * @generated from rpc nexus.v1.NexusService.GetColorModes
    */
@@ -410,8 +411,8 @@ export const NexusService: GenService<{
   /**
    * Chooses how points are coloured; returns the mode now in effect. Fails with INVALID_ARGUMENT for an attribute or
    * palette not listed by GetColorModes, UNAVAILABLE when Surge cannot be reached. The choice is shared by every
-   * frontend.
-   * NOT YET APPLIED: the choice is remembered and reported by GetColorModes, but does not change the colouring yet.
+   * frontend. It applies to every GetLivePoints from then on, and to every tile fetched from then on; tiles deck.gl
+   * has already loaded keep their old colours until it fetches them again.
    *
    * @generated from rpc nexus.v1.NexusService.SetColorMode
    */

@@ -7,20 +7,21 @@ service NexusService {
     // with NOT_FOUND for an unknown node, INVALID_ARGUMENT for a malformed id, UNAVAILABLE when Surge cannot be reached.
     rpc GetNodeDescriptionEndpoint(GetNodeDescriptionEndpointRequest) returns (GetNodeDescriptionEndpointResponse);
 
-    // The points Surge ingested most recently (up to 300,000), coloured, plus a clock showing the time they were
-    // fetched. Meant to be polled: each call returns the whole current snapshot. Fails with UNAVAILABLE when Surge
-    // cannot be reached.
-    rpc GetLivePoints(GetLivePointsRequest) returns (GetLivePointsResponse);
+    // A stream of snapshots of the points Surge ingested most recently (up to 300,000 each), coloured, plus a clock
+    // showing when each was taken. Open it once and keep reading: Nexus sends the latest snapshot straight away, then a
+    // new one every interval (one second by default) until the frontend closes the stream. Every frontend gets the
+    // same snapshots; one that reads slowly skips to the newest rather than falling behind. While Surge cannot be
+    // reached the stream stays open and simply sends nothing new.
+    rpc GetLivePoints(GetLivePointsRequest) returns (stream GetLivePointsResponse);
 
     // The ways points can be coloured: which attributes and palettes are available, and the current choice. Fails with
     // UNAVAILABLE when Surge, which lists the attributes, cannot be reached.
-    // NOT YET APPLIED: points are currently always coloured by elevation (Z) on the blue-green-yellow-red palette.
     rpc GetColorModes(GetColorModesRequest) returns (GetColorModesResponse);
 
     // Chooses how points are coloured; returns the mode now in effect. Fails with INVALID_ARGUMENT for an attribute or
     // palette not listed by GetColorModes, UNAVAILABLE when Surge cannot be reached. The choice is shared by every
-    // frontend.
-    // NOT YET APPLIED: the choice is remembered and reported by GetColorModes, but does not change the colouring yet.
+    // frontend. It applies to every GetLivePoints from then on, and to every tile fetched from then on; tiles deck.gl
+    // has already loaded keep their old colours until it fetches them again.
     rpc SetColorMode(SetColorModeRequest) returns (SetColorModeResponse);
 }
 
@@ -35,8 +36,8 @@ message GetNodeDescriptionEndpointResponse {
 }
 
 message GetLivePointsRequest {
-    // How to colour the points; optional. Use values listed by GetColorModes.
-    // NOT YET APPLIED: accepted but ignored; points are always coloured by elevation (Z) on blue-green-yellow-red.
+    // IGNORED: points are coloured with the mode set through SetColorMode, shared by every frontend. Kept so a request
+    // that sets it still works; it may be removed.
     ColorMode color_mode = 1;
 }
 
@@ -47,7 +48,7 @@ message GetLivePointsRequest {
 message GetLivePointsResponse {
     GeoReference geo_reference = 1;
     Vector3 origin = 2;
-    // The most recently ingested points, coloured by elevation.
+    // The most recently ingested points, coloured with the current colour mode (see SetColorMode).
     PointSet points = 3;
     // HH:mm:ss drawn in magenta points 30 m above the points; draw it in the same layer or its own.
     PointSet clock = 4;
