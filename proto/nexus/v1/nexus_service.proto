@@ -12,12 +12,14 @@ service NexusService {
     // cannot be reached.
     rpc GetLivePoints(GetLivePointsRequest) returns (GetLivePointsResponse);
 
-    // The ways points can be coloured: which attributes and palettes are available, and the current choice.
+    // The ways points can be coloured: which attributes and palettes are available, and the current choice. Fails with
+    // UNAVAILABLE when Surge, which lists the attributes, cannot be reached.
     // NOT YET APPLIED: points are currently always coloured by elevation (Z) on the blue-green-yellow-red palette.
     rpc GetColorModes(GetColorModesRequest) returns (GetColorModesResponse);
 
     // Chooses how points are coloured; returns the mode now in effect. Fails with INVALID_ARGUMENT for an attribute or
-    // palette not listed by GetColorModes. The choice is shared by every frontend.
+    // palette not listed by GetColorModes, UNAVAILABLE when Surge cannot be reached. The choice is shared by every
+    // frontend.
     // NOT YET APPLIED: the choice is remembered and reported by GetColorModes, but does not change the colouring yet.
     rpc SetColorMode(SetColorModeRequest) returns (SetColorModeResponse);
 }
@@ -78,7 +80,8 @@ message GetColorModesRequest {
 }
 
 message GetColorModesResponse {
-    // The point attributes that can be coloured by, e.g. "Z" (elevation) and "Intensity".
+    // The point attributes that can be coloured by, as Surge's dataset declares them, e.g. "Z" (elevation) and
+    // "Intensity".
     repeated string attributes = 1;
     repeated Palette palettes = 2;
     ColorMode current = 3;
@@ -101,8 +104,8 @@ message Rgb {
 }
 
 message ColorMode {
-    // One of GetColorModesResponse.attributes.
-    string attribute = 1;
+    // One of the names in GetColorModesResponse.attributes, e.g. "Z".
+    string attribute_name = 1;
     // One of GetColorModesResponse.palettes' ids.
     string palette_id = 2;
 }
@@ -115,4 +118,3 @@ message SetColorModeResponse {
     // The mode now in effect.
     ColorMode color_mode = 1;
 }
- 
