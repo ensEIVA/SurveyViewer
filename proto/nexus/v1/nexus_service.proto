@@ -2,6 +2,8 @@ syntax = "proto3";
 package nexus.v1;
 
 service NexusService {
+    rpc GetAvailableDatasets(GetAvailableDatasetsRequest) returns (GetAvailableDatasetsResponse);
+
     // The URL of a node's 3D Tiles tileset JSON, for deck.gl to load. The tileset links to its children's tilesets and
     // to the node's points, so deck.gl descends the octree from there by itself. Checks the node exists first: fails
     // with NOT_FOUND for an unknown node, INVALID_ARGUMENT for a malformed id, UNAVAILABLE when Surge cannot be reached.
@@ -25,9 +27,24 @@ service NexusService {
     rpc SetColorMode(SetColorModeRequest) returns (SetColorModeResponse);
 }
 
+message GetAvailableDatasetsRequest {
+
+}
+
+message GetAvailableDatasetsResponse {
+    repeated DatasetDescriptor dataset_descriptors = 1;
+}
+
+message DatasetDescriptor {
+    string dataset_id = 1;
+    string display_name = 2;
+}
+
 message GetNodeDescriptionEndpointRequest {
+    string dataset_id = 1;
+
     // A decimal number as a string: ids outgrow 64-bit integers deep in the octree. The root is "0".
-    string node_id = 1;
+    string node_id = 2;
 }
 
 message GetNodeDescriptionEndpointResponse {
@@ -36,9 +53,11 @@ message GetNodeDescriptionEndpointResponse {
 }
 
 message GetLivePointsRequest {
+    string dataset_id = 1;    
+
     // IGNORED: points are coloured with the mode set through SetColorMode, shared by every frontend. Kept so a request
     // that sets it still works; it may be removed.
-    ColorMode color_mode = 1;
+    ColorMode color_mode = 2;
 }
 
 // Positions are in the dataset's local frame: metres East (X), North (Y) and Up (Z) of geo_reference, the same frame
@@ -119,3 +138,4 @@ message SetColorModeResponse {
     // The mode now in effect.
     ColorMode color_mode = 1;
 }
+ 
