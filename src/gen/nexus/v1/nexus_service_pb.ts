@@ -4,13 +4,156 @@
 
 import type { GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv2";
 import { fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv2";
+import type { Timestamp } from "@bufbuild/protobuf/wkt";
+import { file_google_protobuf_timestamp } from "@bufbuild/protobuf/wkt";
 import type { Message } from "@bufbuild/protobuf";
 
 /**
  * Describes the file nexus/v1/nexus_service.proto.
  */
 export const file_nexus_v1_nexus_service: GenFile = /*@__PURE__*/
-  fileDesc("ChxuZXh1cy92MS9uZXh1c19zZXJ2aWNlLnByb3RvEghuZXh1cy52MSIdChtHZXRBdmFpbGFibGVEYXRhc2V0c1JlcXVlc3QiWAocR2V0QXZhaWxhYmxlRGF0YXNldHNSZXNwb25zZRI4ChNkYXRhc2V0X2Rlc2NyaXB0b3JzGAEgAygLMhsubmV4dXMudjEuRGF0YXNldERlc2NyaXB0b3IiPQoRRGF0YXNldERlc2NyaXB0b3ISEgoKZGF0YXNldF9pZBgBIAEoCRIUCgxkaXNwbGF5X25hbWUYAiABKAkiSAohR2V0Tm9kZURlc2NyaXB0aW9uRW5kcG9pbnRSZXF1ZXN0EhIKCmRhdGFzZXRfaWQYASABKAkSDwoHbm9kZV9pZBgCIAEoCSJHCiJHZXROb2RlRGVzY3JpcHRpb25FbmRwb2ludFJlc3BvbnNlEiEKGW5vZGVfZGVzY3JpcHRpb25fZW5kcG9pbnQYASABKAkiUwoUR2V0TGl2ZVBvaW50c1JlcXVlc3QSEgoKZGF0YXNldF9pZBgBIAEoCRInCgpjb2xvcl9tb2RlGAIgASgLMhMubmV4dXMudjEuQ29sb3JNb2RlIrABChVHZXRMaXZlUG9pbnRzUmVzcG9uc2USLQoNZ2VvX3JlZmVyZW5jZRgBIAEoCzIWLm5leHVzLnYxLkdlb1JlZmVyZW5jZRIhCgZvcmlnaW4YAiABKAsyES5uZXh1cy52MS5WZWN0b3IzEiIKBnBvaW50cxgDIAEoCzISLm5leHVzLnYxLlBvaW50U2V0EiEKBWNsb2NrGAQgASgLMhIubmV4dXMudjEuUG9pbnRTZXQiWgoMR2VvUmVmZXJlbmNlEhgKEGxhdGl0dWRlX2RlZ3JlZXMYASABKAESGQoRbG9uZ2l0dWRlX2RlZ3JlZXMYAiABKAESFQoNaGVpZ2h0X21ldGVycxgDIAEoASIqCgdWZWN0b3IzEgkKAXgYASABKAESCQoBeRgCIAEoARIJCgF6GAMgASgBIjwKCFBvaW50U2V0Eg0KBWNvdW50GAEgASgNEhEKCXBvc2l0aW9ucxgCIAEoDBIOCgZjb2xvcnMYAyABKAwiFgoUR2V0Q29sb3JNb2Rlc1JlcXVlc3QidgoVR2V0Q29sb3JNb2Rlc1Jlc3BvbnNlEhIKCmF0dHJpYnV0ZXMYASADKAkSIwoIcGFsZXR0ZXMYAiADKAsyES5uZXh1cy52MS5QYWxldHRlEiQKB2N1cnJlbnQYAyABKAsyEy5uZXh1cy52MS5Db2xvck1vZGUiQQoHUGFsZXR0ZRIKCgJpZBgBIAEoCRIMCgRuYW1lGAIgASgJEhwKBXN0b3BzGAMgAygLMg0ubmV4dXMudjEuUmdiIiYKA1JnYhIJCgFyGAEgASgNEgkKAWcYAiABKA0SCQoBYhgDIAEoDSI3CglDb2xvck1vZGUSFgoOYXR0cmlidXRlX25hbWUYASABKAkSEgoKcGFsZXR0ZV9pZBgCIAEoCSI+ChNTZXRDb2xvck1vZGVSZXF1ZXN0EicKCmNvbG9yX21vZGUYASABKAsyEy5uZXh1cy52MS5Db2xvck1vZGUiPwoUU2V0Q29sb3JNb2RlUmVzcG9uc2USJwoKY29sb3JfbW9kZRgBIAEoCzITLm5leHVzLnYxLkNvbG9yTW9kZTLjAwoMTmV4dXNTZXJ2aWNlEmUKFEdldEF2YWlsYWJsZURhdGFzZXRzEiUubmV4dXMudjEuR2V0QXZhaWxhYmxlRGF0YXNldHNSZXF1ZXN0GiYubmV4dXMudjEuR2V0QXZhaWxhYmxlRGF0YXNldHNSZXNwb25zZRJ3ChpHZXROb2RlRGVzY3JpcHRpb25FbmRwb2ludBIrLm5leHVzLnYxLkdldE5vZGVEZXNjcmlwdGlvbkVuZHBvaW50UmVxdWVzdBosLm5leHVzLnYxLkdldE5vZGVEZXNjcmlwdGlvbkVuZHBvaW50UmVzcG9uc2USUgoNR2V0TGl2ZVBvaW50cxIeLm5leHVzLnYxLkdldExpdmVQb2ludHNSZXF1ZXN0Gh8ubmV4dXMudjEuR2V0TGl2ZVBvaW50c1Jlc3BvbnNlMAESUAoNR2V0Q29sb3JNb2RlcxIeLm5leHVzLnYxLkdldENvbG9yTW9kZXNSZXF1ZXN0Gh8ubmV4dXMudjEuR2V0Q29sb3JNb2Rlc1Jlc3BvbnNlEk0KDFNldENvbG9yTW9kZRIdLm5leHVzLnYxLlNldENvbG9yTW9kZVJlcXVlc3QaHi5uZXh1cy52MS5TZXRDb2xvck1vZGVSZXNwb25zZWIGcHJvdG8z");
+  fileDesc("ChxuZXh1cy92MS9uZXh1c19zZXJ2aWNlLnByb3RvEghuZXh1cy52MSIcChpHZXRBdmFpbGFibGVWZXNzZWxzUmVxdWVzdCJVChtHZXRBdmFpbGFibGVWZXNzZWxzUmVzcG9uc2USNgoSdmVzc2VsX2Rlc2NyaXB0b3JzGAEgAygLMhoubmV4dXMudjEuVmVzc2VsRGVzY3JpcHRvciI7ChBWZXNzZWxEZXNjcmlwdG9yEhEKCXZlc3NlbF9pZBgBIAEoCRIUCgxkaXNwbGF5X25hbWUYAiABKAkiLQoYR2V0VmVzc2VsUG9zaXRpb25SZXF1ZXN0EhEKCXZlc3NlbF9pZBgBIAEoCSLBAQoZR2V0VmVzc2VsUG9zaXRpb25SZXNwb25zZRIVCg1wb3NfbG9uZ2l0dWRlGAEgASgBEhQKDHBvc19sYXRpdHVkZRgCIAEoARISCgpwb3NfaGVpZ2h0GAMgASgBEhAKCHJvdF9yb2xsGAQgASgBEhEKCXJvdF9waXRjaBgFIAEoARIPCgdyb3RfeWF3GAYgASgBEi0KCXRpbWVzdGFtcBgHIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXAiHQobR2V0QXZhaWxhYmxlRGF0YXNldHNSZXF1ZXN0IlgKHEdldEF2YWlsYWJsZURhdGFzZXRzUmVzcG9uc2USOAoTZGF0YXNldF9kZXNjcmlwdG9ycxgBIAMoCzIbLm5leHVzLnYxLkRhdGFzZXREZXNjcmlwdG9yIj0KEURhdGFzZXREZXNjcmlwdG9yEhIKCmRhdGFzZXRfaWQYASABKAkSFAoMZGlzcGxheV9uYW1lGAIgASgJIkgKIUdldE5vZGVEZXNjcmlwdGlvbkVuZHBvaW50UmVxdWVzdBISCgpkYXRhc2V0X2lkGAEgASgJEg8KB25vZGVfaWQYAiABKAkiRwoiR2V0Tm9kZURlc2NyaXB0aW9uRW5kcG9pbnRSZXNwb25zZRIhChlub2RlX2Rlc2NyaXB0aW9uX2VuZHBvaW50GAEgASgJIlMKFEdldExpdmVQb2ludHNSZXF1ZXN0EhIKCmRhdGFzZXRfaWQYASABKAkSJwoKY29sb3JfbW9kZRgCIAEoCzITLm5leHVzLnYxLkNvbG9yTW9kZSKwAQoVR2V0TGl2ZVBvaW50c1Jlc3BvbnNlEi0KDWdlb19yZWZlcmVuY2UYASABKAsyFi5uZXh1cy52MS5HZW9SZWZlcmVuY2USIQoGb3JpZ2luGAIgASgLMhEubmV4dXMudjEuVmVjdG9yMxIiCgZwb2ludHMYAyABKAsyEi5uZXh1cy52MS5Qb2ludFNldBIhCgVjbG9jaxgEIAEoCzISLm5leHVzLnYxLlBvaW50U2V0IloKDEdlb1JlZmVyZW5jZRIYChBsYXRpdHVkZV9kZWdyZWVzGAEgASgBEhkKEWxvbmdpdHVkZV9kZWdyZWVzGAIgASgBEhUKDWhlaWdodF9tZXRlcnMYAyABKAEiKgoHVmVjdG9yMxIJCgF4GAEgASgBEgkKAXkYAiABKAESCQoBehgDIAEoASI8CghQb2ludFNldBINCgVjb3VudBgBIAEoDRIRCglwb3NpdGlvbnMYAiABKAwSDgoGY29sb3JzGAMgASgMIhYKFEdldENvbG9yTW9kZXNSZXF1ZXN0InYKFUdldENvbG9yTW9kZXNSZXNwb25zZRISCgphdHRyaWJ1dGVzGAEgAygJEiMKCHBhbGV0dGVzGAIgAygLMhEubmV4dXMudjEuUGFsZXR0ZRIkCgdjdXJyZW50GAMgASgLMhMubmV4dXMudjEuQ29sb3JNb2RlIkEKB1BhbGV0dGUSCgoCaWQYASABKAkSDAoEbmFtZRgCIAEoCRIcCgVzdG9wcxgDIAMoCzINLm5leHVzLnYxLlJnYiImCgNSZ2ISCQoBchgBIAEoDRIJCgFnGAIgASgNEgkKAWIYAyABKA0iNwoJQ29sb3JNb2RlEhYKDmF0dHJpYnV0ZV9uYW1lGAEgASgJEhIKCnBhbGV0dGVfaWQYAiABKAkiPgoTU2V0Q29sb3JNb2RlUmVxdWVzdBInCgpjb2xvcl9tb2RlGAEgASgLMhMubmV4dXMudjEuQ29sb3JNb2RlIj8KFFNldENvbG9yTW9kZVJlc3BvbnNlEicKCmNvbG9yX21vZGUYASABKAsyEy5uZXh1cy52MS5Db2xvck1vZGUypwUKDE5leHVzU2VydmljZRJlChRHZXRBdmFpbGFibGVEYXRhc2V0cxIlLm5leHVzLnYxLkdldEF2YWlsYWJsZURhdGFzZXRzUmVxdWVzdBomLm5leHVzLnYxLkdldEF2YWlsYWJsZURhdGFzZXRzUmVzcG9uc2USdwoaR2V0Tm9kZURlc2NyaXB0aW9uRW5kcG9pbnQSKy5uZXh1cy52MS5HZXROb2RlRGVzY3JpcHRpb25FbmRwb2ludFJlcXVlc3QaLC5uZXh1cy52MS5HZXROb2RlRGVzY3JpcHRpb25FbmRwb2ludFJlc3BvbnNlElIKDUdldExpdmVQb2ludHMSHi5uZXh1cy52MS5HZXRMaXZlUG9pbnRzUmVxdWVzdBofLm5leHVzLnYxLkdldExpdmVQb2ludHNSZXNwb25zZTABElAKDUdldENvbG9yTW9kZXMSHi5uZXh1cy52MS5HZXRDb2xvck1vZGVzUmVxdWVzdBofLm5leHVzLnYxLkdldENvbG9yTW9kZXNSZXNwb25zZRJNCgxTZXRDb2xvck1vZGUSHS5uZXh1cy52MS5TZXRDb2xvck1vZGVSZXF1ZXN0Gh4ubmV4dXMudjEuU2V0Q29sb3JNb2RlUmVzcG9uc2USYgoTR2V0QXZhaWxhYmxlVmVzc2VscxIkLm5leHVzLnYxLkdldEF2YWlsYWJsZVZlc3NlbHNSZXF1ZXN0GiUubmV4dXMudjEuR2V0QXZhaWxhYmxlVmVzc2Vsc1Jlc3BvbnNlEl4KEUdldFZlc3NlbFBvc2l0aW9uEiIubmV4dXMudjEuR2V0VmVzc2VsUG9zaXRpb25SZXF1ZXN0GiMubmV4dXMudjEuR2V0VmVzc2VsUG9zaXRpb25SZXNwb25zZTABYgZwcm90bzM", [file_google_protobuf_timestamp]);
+
+/**
+ * @generated from message nexus.v1.GetAvailableVesselsRequest
+ */
+export type GetAvailableVesselsRequest = Message<"nexus.v1.GetAvailableVesselsRequest"> & {
+};
+
+/**
+ * Describes the message nexus.v1.GetAvailableVesselsRequest.
+ * Use `create(GetAvailableVesselsRequestSchema)` to create a new message.
+ */
+export const GetAvailableVesselsRequestSchema: GenMessage<GetAvailableVesselsRequest> = /*@__PURE__*/
+  messageDesc(file_nexus_v1_nexus_service, 0);
+
+/**
+ * @generated from message nexus.v1.GetAvailableVesselsResponse
+ */
+export type GetAvailableVesselsResponse = Message<"nexus.v1.GetAvailableVesselsResponse"> & {
+  /**
+   * @generated from field: repeated nexus.v1.VesselDescriptor vessel_descriptors = 1;
+   */
+  vesselDescriptors: VesselDescriptor[];
+};
+
+/**
+ * Describes the message nexus.v1.GetAvailableVesselsResponse.
+ * Use `create(GetAvailableVesselsResponseSchema)` to create a new message.
+ */
+export const GetAvailableVesselsResponseSchema: GenMessage<GetAvailableVesselsResponse> = /*@__PURE__*/
+  messageDesc(file_nexus_v1_nexus_service, 1);
+
+/**
+ * @generated from message nexus.v1.VesselDescriptor
+ */
+export type VesselDescriptor = Message<"nexus.v1.VesselDescriptor"> & {
+  /**
+   * Stable identifier to pass to GetVesselPosition.
+   *
+   * @generated from field: string vessel_id = 1;
+   */
+  vesselId: string;
+
+  /**
+   * For display, e.g. "Vessel A".
+   *
+   * @generated from field: string display_name = 2;
+   */
+  displayName: string;
+};
+
+/**
+ * Describes the message nexus.v1.VesselDescriptor.
+ * Use `create(VesselDescriptorSchema)` to create a new message.
+ */
+export const VesselDescriptorSchema: GenMessage<VesselDescriptor> = /*@__PURE__*/
+  messageDesc(file_nexus_v1_nexus_service, 2);
+
+/**
+ * @generated from message nexus.v1.GetVesselPositionRequest
+ */
+export type GetVesselPositionRequest = Message<"nexus.v1.GetVesselPositionRequest"> & {
+  /**
+   * One of GetAvailableVesselsResponse's vessel ids.
+   *
+   * @generated from field: string vessel_id = 1;
+   */
+  vesselId: string;
+};
+
+/**
+ * Describes the message nexus.v1.GetVesselPositionRequest.
+ * Use `create(GetVesselPositionRequestSchema)` to create a new message.
+ */
+export const GetVesselPositionRequestSchema: GenMessage<GetVesselPositionRequest> = /*@__PURE__*/
+  messageDesc(file_nexus_v1_nexus_service, 3);
+
+/**
+ * Where a vessel was, and how it was oriented, at one moment. Angles follow the usual maritime convention, so a
+ * frontend can draw the vessel without guessing.
+ *
+ * @generated from message nexus.v1.GetVesselPositionResponse
+ */
+export type GetVesselPositionResponse = Message<"nexus.v1.GetVesselPositionResponse"> & {
+  /**
+   * WGS84, degrees, east positive.
+   *
+   * @generated from field: double pos_longitude = 1;
+   */
+  posLongitude: number;
+
+  /**
+   * WGS84, degrees, north positive.
+   *
+   * @generated from field: double pos_latitude = 2;
+   */
+  posLatitude: number;
+
+  /**
+   * Metres above the WGS84 ellipsoid.
+   * TO AGREE: ellipsoid or mean sea level — they differ by up to about 100 m depending on location, which matters
+   * when the vessel is drawn next to the point clouds.
+   *
+   * @generated from field: double pos_height = 3;
+   */
+  posHeight: number;
+
+  /**
+   * Degrees, positive with starboard down.
+   *
+   * @generated from field: double rot_roll = 4;
+   */
+  rotRoll: number;
+
+  /**
+   * Degrees, positive with the bow up.
+   *
+   * @generated from field: double rot_pitch = 5;
+   */
+  rotPitch: number;
+
+  /**
+   * Degrees clockwise from true north (the vessel's heading), 0 to 360.
+   *
+   * @generated from field: double rot_yaw = 6;
+   */
+  rotYaw: number;
+
+  /**
+   * When the position was measured, not when it was sent.
+   *
+   * @generated from field: google.protobuf.Timestamp timestamp = 7;
+   */
+  timestamp?: Timestamp | undefined;
+};
+
+/**
+ * Describes the message nexus.v1.GetVesselPositionResponse.
+ * Use `create(GetVesselPositionResponseSchema)` to create a new message.
+ */
+export const GetVesselPositionResponseSchema: GenMessage<GetVesselPositionResponse> = /*@__PURE__*/
+  messageDesc(file_nexus_v1_nexus_service, 4);
 
 /**
  * @generated from message nexus.v1.GetAvailableDatasetsRequest
@@ -23,7 +166,7 @@ export type GetAvailableDatasetsRequest = Message<"nexus.v1.GetAvailableDatasets
  * Use `create(GetAvailableDatasetsRequestSchema)` to create a new message.
  */
 export const GetAvailableDatasetsRequestSchema: GenMessage<GetAvailableDatasetsRequest> = /*@__PURE__*/
-  messageDesc(file_nexus_v1_nexus_service, 0);
+  messageDesc(file_nexus_v1_nexus_service, 5);
 
 /**
  * @generated from message nexus.v1.GetAvailableDatasetsResponse
@@ -40,18 +183,22 @@ export type GetAvailableDatasetsResponse = Message<"nexus.v1.GetAvailableDataset
  * Use `create(GetAvailableDatasetsResponseSchema)` to create a new message.
  */
 export const GetAvailableDatasetsResponseSchema: GenMessage<GetAvailableDatasetsResponse> = /*@__PURE__*/
-  messageDesc(file_nexus_v1_nexus_service, 1);
+  messageDesc(file_nexus_v1_nexus_service, 6);
 
 /**
  * @generated from message nexus.v1.DatasetDescriptor
  */
 export type DatasetDescriptor = Message<"nexus.v1.DatasetDescriptor"> & {
   /**
+   * Stable identifier to pass to the other calls: 1-64 letters, digits, '-' or '_', e.g. "survey-a".
+   *
    * @generated from field: string dataset_id = 1;
    */
   datasetId: string;
 
   /**
+   * For display, e.g. "Survey A".
+   *
    * @generated from field: string display_name = 2;
    */
   displayName: string;
@@ -62,13 +209,15 @@ export type DatasetDescriptor = Message<"nexus.v1.DatasetDescriptor"> & {
  * Use `create(DatasetDescriptorSchema)` to create a new message.
  */
 export const DatasetDescriptorSchema: GenMessage<DatasetDescriptor> = /*@__PURE__*/
-  messageDesc(file_nexus_v1_nexus_service, 2);
+  messageDesc(file_nexus_v1_nexus_service, 7);
 
 /**
  * @generated from message nexus.v1.GetNodeDescriptionEndpointRequest
  */
 export type GetNodeDescriptionEndpointRequest = Message<"nexus.v1.GetNodeDescriptionEndpointRequest"> & {
   /**
+   * One of GetAvailableDatasetsResponse's dataset ids.
+   *
    * @generated from field: string dataset_id = 1;
    */
   datasetId: string;
@@ -86,14 +235,14 @@ export type GetNodeDescriptionEndpointRequest = Message<"nexus.v1.GetNodeDescrip
  * Use `create(GetNodeDescriptionEndpointRequestSchema)` to create a new message.
  */
 export const GetNodeDescriptionEndpointRequestSchema: GenMessage<GetNodeDescriptionEndpointRequest> = /*@__PURE__*/
-  messageDesc(file_nexus_v1_nexus_service, 3);
+  messageDesc(file_nexus_v1_nexus_service, 8);
 
 /**
  * @generated from message nexus.v1.GetNodeDescriptionEndpointResponse
  */
 export type GetNodeDescriptionEndpointResponse = Message<"nexus.v1.GetNodeDescriptionEndpointResponse"> & {
   /**
-   * Absolute URL of the node's tileset JSON, e.g. "http://localhost:5007/tileset/node/0.json".
+   * Absolute URL of the node's tileset JSON, e.g. "http://localhost:5007/datasets/survey-a/tileset/node/0.json".
    *
    * @generated from field: string node_description_endpoint = 1;
    */
@@ -105,13 +254,15 @@ export type GetNodeDescriptionEndpointResponse = Message<"nexus.v1.GetNodeDescri
  * Use `create(GetNodeDescriptionEndpointResponseSchema)` to create a new message.
  */
 export const GetNodeDescriptionEndpointResponseSchema: GenMessage<GetNodeDescriptionEndpointResponse> = /*@__PURE__*/
-  messageDesc(file_nexus_v1_nexus_service, 4);
+  messageDesc(file_nexus_v1_nexus_service, 9);
 
 /**
  * @generated from message nexus.v1.GetLivePointsRequest
  */
 export type GetLivePointsRequest = Message<"nexus.v1.GetLivePointsRequest"> & {
   /**
+   * One of GetAvailableDatasetsResponse's dataset ids.
+   *
    * @generated from field: string dataset_id = 1;
    */
   datasetId: string;
@@ -130,7 +281,7 @@ export type GetLivePointsRequest = Message<"nexus.v1.GetLivePointsRequest"> & {
  * Use `create(GetLivePointsRequestSchema)` to create a new message.
  */
 export const GetLivePointsRequestSchema: GenMessage<GetLivePointsRequest> = /*@__PURE__*/
-  messageDesc(file_nexus_v1_nexus_service, 5);
+  messageDesc(file_nexus_v1_nexus_service, 10);
 
 /**
  * Positions are in the dataset's local frame: metres East (X), North (Y) and Up (Z) of geo_reference, the same frame
@@ -171,7 +322,7 @@ export type GetLivePointsResponse = Message<"nexus.v1.GetLivePointsResponse"> & 
  * Use `create(GetLivePointsResponseSchema)` to create a new message.
  */
 export const GetLivePointsResponseSchema: GenMessage<GetLivePointsResponse> = /*@__PURE__*/
-  messageDesc(file_nexus_v1_nexus_service, 6);
+  messageDesc(file_nexus_v1_nexus_service, 11);
 
 /**
  * @generated from message nexus.v1.GeoReference
@@ -198,7 +349,7 @@ export type GeoReference = Message<"nexus.v1.GeoReference"> & {
  * Use `create(GeoReferenceSchema)` to create a new message.
  */
 export const GeoReferenceSchema: GenMessage<GeoReference> = /*@__PURE__*/
-  messageDesc(file_nexus_v1_nexus_service, 7);
+  messageDesc(file_nexus_v1_nexus_service, 12);
 
 /**
  * @generated from message nexus.v1.Vector3
@@ -225,7 +376,7 @@ export type Vector3 = Message<"nexus.v1.Vector3"> & {
  * Use `create(Vector3Schema)` to create a new message.
  */
 export const Vector3Schema: GenMessage<Vector3> = /*@__PURE__*/
-  messageDesc(file_nexus_v1_nexus_service, 8);
+  messageDesc(file_nexus_v1_nexus_service, 13);
 
 /**
  * Binary rather than repeated fields, so a browser can view the bytes as typed arrays instead of decoding hundreds of
@@ -260,7 +411,7 @@ export type PointSet = Message<"nexus.v1.PointSet"> & {
  * Use `create(PointSetSchema)` to create a new message.
  */
 export const PointSetSchema: GenMessage<PointSet> = /*@__PURE__*/
-  messageDesc(file_nexus_v1_nexus_service, 9);
+  messageDesc(file_nexus_v1_nexus_service, 14);
 
 /**
  * @generated from message nexus.v1.GetColorModesRequest
@@ -273,7 +424,7 @@ export type GetColorModesRequest = Message<"nexus.v1.GetColorModesRequest"> & {
  * Use `create(GetColorModesRequestSchema)` to create a new message.
  */
 export const GetColorModesRequestSchema: GenMessage<GetColorModesRequest> = /*@__PURE__*/
-  messageDesc(file_nexus_v1_nexus_service, 10);
+  messageDesc(file_nexus_v1_nexus_service, 15);
 
 /**
  * @generated from message nexus.v1.GetColorModesResponse
@@ -303,7 +454,7 @@ export type GetColorModesResponse = Message<"nexus.v1.GetColorModesResponse"> & 
  * Use `create(GetColorModesResponseSchema)` to create a new message.
  */
 export const GetColorModesResponseSchema: GenMessage<GetColorModesResponse> = /*@__PURE__*/
-  messageDesc(file_nexus_v1_nexus_service, 11);
+  messageDesc(file_nexus_v1_nexus_service, 16);
 
 /**
  * A gradient, from an attribute's lowest value (the first stop) to its highest (the last), stops evenly spaced.
@@ -336,7 +487,7 @@ export type Palette = Message<"nexus.v1.Palette"> & {
  * Use `create(PaletteSchema)` to create a new message.
  */
 export const PaletteSchema: GenMessage<Palette> = /*@__PURE__*/
-  messageDesc(file_nexus_v1_nexus_service, 12);
+  messageDesc(file_nexus_v1_nexus_service, 17);
 
 /**
  * @generated from message nexus.v1.Rgb
@@ -365,7 +516,7 @@ export type Rgb = Message<"nexus.v1.Rgb"> & {
  * Use `create(RgbSchema)` to create a new message.
  */
 export const RgbSchema: GenMessage<Rgb> = /*@__PURE__*/
-  messageDesc(file_nexus_v1_nexus_service, 13);
+  messageDesc(file_nexus_v1_nexus_service, 18);
 
 /**
  * @generated from message nexus.v1.ColorMode
@@ -391,7 +542,7 @@ export type ColorMode = Message<"nexus.v1.ColorMode"> & {
  * Use `create(ColorModeSchema)` to create a new message.
  */
 export const ColorModeSchema: GenMessage<ColorMode> = /*@__PURE__*/
-  messageDesc(file_nexus_v1_nexus_service, 14);
+  messageDesc(file_nexus_v1_nexus_service, 19);
 
 /**
  * @generated from message nexus.v1.SetColorModeRequest
@@ -408,7 +559,7 @@ export type SetColorModeRequest = Message<"nexus.v1.SetColorModeRequest"> & {
  * Use `create(SetColorModeRequestSchema)` to create a new message.
  */
 export const SetColorModeRequestSchema: GenMessage<SetColorModeRequest> = /*@__PURE__*/
-  messageDesc(file_nexus_v1_nexus_service, 15);
+  messageDesc(file_nexus_v1_nexus_service, 20);
 
 /**
  * @generated from message nexus.v1.SetColorModeResponse
@@ -427,13 +578,17 @@ export type SetColorModeResponse = Message<"nexus.v1.SetColorModeResponse"> & {
  * Use `create(SetColorModeResponseSchema)` to create a new message.
  */
 export const SetColorModeResponseSchema: GenMessage<SetColorModeResponse> = /*@__PURE__*/
-  messageDesc(file_nexus_v1_nexus_service, 16);
+  messageDesc(file_nexus_v1_nexus_service, 21);
 
 /**
  * @generated from service nexus.v1.NexusService
  */
 export const NexusService: GenService<{
   /**
+   * The datasets (point clouds) Surge holds, to display and choose from. Each has its own octree, attributes and
+   * place on the globe; the calls below name the dataset they are about. Fails with UNAVAILABLE when Surge cannot be
+   * reached.
+   *
    * @generated from rpc nexus.v1.NexusService.GetAvailableDatasets
    */
   getAvailableDatasets: {
@@ -444,7 +599,8 @@ export const NexusService: GenService<{
   /**
    * The URL of a node's 3D Tiles tileset JSON, for deck.gl to load. The tileset links to its children's tilesets and
    * to the node's points, so deck.gl descends the octree from there by itself. Checks the node exists first: fails
-   * with NOT_FOUND for an unknown node, INVALID_ARGUMENT for a malformed id, UNAVAILABLE when Surge cannot be reached.
+   * with NOT_FOUND for an unknown dataset or node, INVALID_ARGUMENT for a malformed id, UNAVAILABLE when Surge cannot
+   * be reached.
    *
    * @generated from rpc nexus.v1.NexusService.GetNodeDescriptionEndpoint
    */
@@ -455,10 +611,12 @@ export const NexusService: GenService<{
   },
   /**
    * A stream of snapshots of the points Surge ingested most recently (up to 300,000 each), coloured, plus a clock
-   * showing when each was taken. Open it once and keep reading: Nexus sends the latest snapshot straight away, then a
-   * new one every interval (one second by default) until the frontend closes the stream. Every frontend gets the
-   * same snapshots; one that reads slowly skips to the newest rather than falling behind. While Surge cannot be
-   * reached the stream stays open and simply sends nothing new.
+   * showing when each was taken. Open it once and keep reading: the first snapshot arrives within one interval (one
+   * second by default; straight away if other frontends are already watching the dataset), then a new one every
+   * interval until the frontend closes the stream. Every frontend gets the
+   * same snapshots of a dataset; one that reads slowly skips to the newest rather than falling behind. For several
+   * datasets, open one stream per dataset. Fails at the start with NOT_FOUND for an unknown dataset; once open, while
+   * Surge cannot be reached the stream stays open and simply sends nothing new.
    *
    * @generated from rpc nexus.v1.NexusService.GetLivePoints
    */
@@ -468,8 +626,9 @@ export const NexusService: GenService<{
     output: typeof GetLivePointsResponseSchema;
   },
   /**
-   * The ways points can be coloured: which attributes and palettes are available, and the current choice. Fails with
-   * UNAVAILABLE when Surge, which lists the attributes, cannot be reached.
+   * The ways points can be coloured: which attributes and palettes are available, and the current choice. One colour
+   * mode applies to every dataset, so only attributes that every dataset has are listed. Fails with UNAVAILABLE when
+   * Surge, which lists the attributes, cannot be reached.
    *
    * @generated from rpc nexus.v1.NexusService.GetColorModes
    */
@@ -490,6 +649,32 @@ export const NexusService: GenService<{
     methodKind: "unary";
     input: typeof SetColorModeRequestSchema;
     output: typeof SetColorModeResponseSchema;
+  },
+  /**
+   * The vessels Nexus can report positions for, to display and choose from. Fails with UNAVAILABLE when their source
+   * cannot be reached.
+   *
+   * @generated from rpc nexus.v1.NexusService.GetAvailableVessels
+   */
+  getAvailableVessels: {
+    methodKind: "unary";
+    input: typeof GetAvailableVesselsRequestSchema;
+    output: typeof GetAvailableVesselsResponseSchema;
+  },
+  /**
+   * A stream of a vessel's position and attitude. Open it once and keep reading: the latest known position arrives
+   * straight away, then a new one each time the vessel's position is updated, until the frontend closes the stream.
+   * For several vessels, open one stream per vessel. Fails at the start with NOT_FOUND for an unknown vessel; once
+   * open, while the position source cannot be reached the stream stays open and simply sends nothing new — compare
+   * timestamp with the current time to tell a stale position from a fresh one.
+   * TO AGREE: the update rate, and whether a slow frontend skips to the newest position like GetLivePoints.
+   *
+   * @generated from rpc nexus.v1.NexusService.GetVesselPosition
+   */
+  getVesselPosition: {
+    methodKind: "server_streaming";
+    input: typeof GetVesselPositionRequestSchema;
+    output: typeof GetVesselPositionResponseSchema;
   },
 }> = /*@__PURE__*/
   serviceDesc(file_nexus_v1_nexus_service, 0);

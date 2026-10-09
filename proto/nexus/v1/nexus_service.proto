@@ -1,22 +1,32 @@
 syntax = "proto3";
 package nexus.v1;
 
+import "google/protobuf/timestamp.proto";
+
 service NexusService {
+    // The datasets (point clouds) Surge holds, to display and choose from. Each has its own octree, attributes and
+    // place on the globe; the calls below name the dataset they are about. Fails with UNAVAILABLE when Surge cannot be
+    // reached.
     rpc GetAvailableDatasets(GetAvailableDatasetsRequest) returns (GetAvailableDatasetsResponse);
+
     // The URL of a node's 3D Tiles tileset JSON, for deck.gl to load. The tileset links to its children's tilesets and
     // to the node's points, so deck.gl descends the octree from there by itself. Checks the node exists first: fails
-    // with NOT_FOUND for an unknown node, INVALID_ARGUMENT for a malformed id, UNAVAILABLE when Surge cannot be reached.
+    // with NOT_FOUND for an unknown dataset or node, INVALID_ARGUMENT for a malformed id, UNAVAILABLE when Surge cannot
+    // be reached.
     rpc GetNodeDescriptionEndpoint(GetNodeDescriptionEndpointRequest) returns (GetNodeDescriptionEndpointResponse);
 
     // A stream of snapshots of the points Surge ingested most recently (up to 300,000 each), coloured, plus a clock
-    // showing when each was taken. Open it once and keep reading: Nexus sends the latest snapshot straight away, then a
-    // new one every interval (one second by default) until the frontend closes the stream. Every frontend gets the
-    // same snapshots; one that reads slowly skips to the newest rather than falling behind. While Surge cannot be
-    // reached the stream stays open and simply sends nothing new.
+    // showing when each was taken. Open it once and keep reading: the first snapshot arrives within one interval (one
+    // second by default; straight away if other frontends are already watching the dataset), then a new one every
+    // interval until the frontend closes the stream. Every frontend gets the
+    // same snapshots of a dataset; one that reads slowly skips to the newest rather than falling behind. For several
+    // datasets, open one stream per dataset. Fails at the start with NOT_FOUND for an unknown dataset; once open, while
+    // Surge cannot be reached the stream stays open and simply sends nothing new.
     rpc GetLivePoints(GetLivePointsRequest) returns (stream GetLivePointsResponse);
 
-    // The ways points can be coloured: which attributes and palettes are available, and the current choice. Fails with
-    // UNAVAILABLE when Surge, which lists the attributes, cannot be reached.
+    // The ways points can be coloured: which attributes and palettes are available, and the current choice. One colour
+    // mode applies to every dataset, so only attributes that every dataset has are listed. Fails with UNAVAILABLE when
+    // Surge, which lists the attributes, cannot be reached.
     rpc GetColorModes(GetColorModesRequest) returns (GetColorModesResponse);
 
     // Chooses how points are coloured; returns the mode now in effect. Fails with INVALID_ARGUMENT for an attribute or
@@ -24,6 +34,57 @@ service NexusService {
     // frontend. It applies to every GetLivePoints from then on, and to every tile fetched from then on; tiles deck.gl
     // has already loaded keep their old colours until it fetches them again.
     rpc SetColorMode(SetColorModeRequest) returns (SetColorModeResponse);
+
+    // The vessels Nexus can report positions for, to display and choose from. Fails with UNAVAILABLE when their source
+    // cannot be reached.
+    rpc GetAvailableVessels(GetAvailableVesselsRequest) returns (GetAvailableVesselsResponse);
+
+    // A stream of a vessel's position and attitude. Open it once and keep reading: the latest known position arrives
+    // straight away, then a new one each time the vessel's position is updated, until the frontend closes the stream.
+    // For several vessels, open one stream per vessel. Fails at the start with NOT_FOUND for an unknown vessel; once
+    // open, while the position source cannot be reached the stream stays open and simply sends nothing new — compare
+    // timestamp with the current time to tell a stale position from a fresh one.
+    // TO AGREE: the update rate, and whether a slow frontend skips to the newest position like GetLivePoints.
+    rpc GetVesselPosition(GetVesselPositionRequest) returns (stream GetVesselPositionResponse);
+}
+
+message GetAvailableVesselsRequest { }
+
+message GetAvailableVesselsResponse {
+    repeated VesselDescriptor vessel_descriptors = 1;
+}
+
+message VesselDescriptor {
+    // Stable identifier to pass to GetVesselPosition.
+    string vessel_id = 1;
+    // For display, e.g. "Vessel A".
+    string display_name = 2;
+}
+
+message GetVesselPositionRequest {
+    // One of GetAvailableVesselsResponse's vessel ids.
+    string vessel_id = 1;
+}
+
+// Where a vessel was, and how it was oriented, at one moment. Angles follow the usual maritime convention, so a
+// frontend can draw the vessel without guessing.
+message GetVesselPositionResponse {
+    // WGS84, degrees, east positive.
+    double pos_longitude = 1;
+    // WGS84, degrees, north positive.
+    double pos_latitude = 2;
+    // Metres above the WGS84 ellipsoid.
+    // TO AGREE: ellipsoid or mean sea level — they differ by up to about 100 m depending on location, which matters
+    // when the vessel is drawn next to the point clouds.
+    double pos_height = 3;
+    // Degrees, positive with starboard down.
+    double rot_roll = 4;
+    // Degrees, positive with the bow up.
+    double rot_pitch = 5;
+    // Degrees clockwise from true north (the vessel's heading), 0 to 360.
+    double rot_yaw = 6;
+    // When the position was measured, not when it was sent.
+    google.protobuf.Timestamp timestamp = 7;
 }
 
 message GetAvailableDatasetsRequest {
@@ -35,11 +96,14 @@ message GetAvailableDatasetsResponse {
 }
 
 message DatasetDescriptor {
+    // Stable identifier to pass to the other calls: 1-64 letters, digits, '-' or '_', e.g. "survey-a".
     string dataset_id = 1;
+    // For display, e.g. "Survey A".
     string display_name = 2;
 }
 
 message GetNodeDescriptionEndpointRequest {
+    // One of GetAvailableDatasetsResponse's dataset ids.
     string dataset_id = 1;
 
     // A decimal number as a string: ids outgrow 64-bit integers deep in the octree. The root is "0".
@@ -47,12 +111,13 @@ message GetNodeDescriptionEndpointRequest {
 }
 
 message GetNodeDescriptionEndpointResponse {
-    // Absolute URL of the node's tileset JSON, e.g. "http://localhost:5007/tileset/node/0.json".
+    // Absolute URL of the node's tileset JSON, e.g. "http://localhost:5007/datasets/survey-a/tileset/node/0.json".
     string node_description_endpoint = 1;
 }
 
 message GetLivePointsRequest {
-    string dataset_id = 1;    
+    // One of GetAvailableDatasetsResponse's dataset ids.
+    string dataset_id = 1;
 
     // IGNORED: points are coloured with the mode set through SetColorMode, shared by every frontend. Kept so a request
     // that sets it still works; it may be removed.
@@ -131,7 +196,6 @@ message ColorMode {
 
 message SetColorModeRequest {
     ColorMode color_mode = 1;
-    string dataset_id
 }
 
 message SetColorModeResponse {
