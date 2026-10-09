@@ -1,0 +1,14 @@
+.basemap-attribution {
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1;
+  font: 10px/1.2 sans-serif;
+  color: #ccc;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 1px 6px;
+  border-radius: 3px;
+  white-space: nowrap;
+  pointer-events: none;
+}

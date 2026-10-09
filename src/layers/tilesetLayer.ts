@@ -3,7 +3,7 @@ import { Tiles3DLoader } from '@loaders.gl/3d-tiles'
 import type { TilesetSlot } from '../hooks/useLiveTileset'
 
 const TILE_CACHE_MB = 32
-const MAX_SCREEN_SPACE_ERROR = 8
+const MAX_SCREEN_SPACE_ERROR = 4
 const MAX_TILES_SELECTED = 800
 const SELECTION_DEBOUNCE_MS = 150
 const MAX_CONCURRENT_TILE_REQUESTS = 12
@@ -34,15 +34,15 @@ export function makeTilesetLayer(
     loaders: [Tiles3DLoader],
     loadOptions: {
       tileset: {
-        maximumMemoryUsage: TILE_CACHE_MB,
+        // maximumMemoryUsage: TILE_CACHE_MB,
         maximumScreenSpaceError: MAX_SCREEN_SPACE_ERROR,
-        maximumTilesSelected: MAX_TILES_SELECTED,
-        debounceTime: SELECTION_DEBOUNCE_MS,
-        throttleRequests: true,
-        maxRequests: MAX_CONCURRENT_TILE_REQUESTS,
+        // maximumTilesSelected: MAX_TILES_SELECTED,
+        // debounceTime: SELECTION_DEBOUNCE_MS,
+        // throttleRequests: true,
+        // maxRequests: MAX_CONCURRENT_TILE_REQUESTS,
       },
     },
-    pointSize: 2,
+    pointSize: 4,
     ...callbacks,
   })
 }

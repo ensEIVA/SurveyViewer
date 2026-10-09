@@ -1,10 +1,12 @@
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useMemo, useRef, useState } from 'react'
 import DeckGL from '@deck.gl/react'
 import { MapView, type MapViewState } from '@deck.gl/core'
+import { BASEMAP_ATTRIBUTION, makeBasemapLayer } from '../layers/basemapLayer'
 import { CameraOverlay } from './CameraOverlay'
 import { DatasetSource, type SourceReport } from './DatasetSource'
 import { MetricsOverlay, type DeckMetrics } from './MetricsOverlay'
 import { StatusOverlay } from './StatusOverlay'
+import './Scene.css'
 
 const INITIAL_VIEW_STATE: MapViewState = {
   longitude: 0,
@@ -40,6 +42,8 @@ export function Scene({ sources, colorVersion }: Props) {
   const [viewState, setViewState] = useState<MapViewState>(INITIAL_VIEW_STATE)
   const [metrics, setMetrics] = useState<DeckMetrics | null>(null)
   const [reports, setReports] = useState<Record<string, SourceReport>>({})
+  // One per scene: a layer instance can't be shared between DeckGL canvases.
+  const basemap = useMemo(() => makeBasemapLayer(), [])
 
   const onReport = useCallback((datasetId: string, report: SourceReport | null) => {
     setReports(prev => {
@@ -59,7 +63,8 @@ export function Scene({ sources, colorVersion }: Props) {
     setViewState(vs => ({ ...vs, longitude, latitude, zoom: Number.isFinite(zoom) ? zoom : vs.zoom }))
   }, [])
 
-  const layers = sources.flatMap(s => reports[s.datasetId]?.layers ?? [])
+  // Basemap first: it must be drawn behind everything (see makeBasemapLayer).
+  const layers = [basemap, ...sources.flatMap(s => reports[s.datasetId]?.layers ?? [])]
   const status =
     sources.length === 0
       ? 'no dataset — add one above'
@@ -84,6 +89,7 @@ export function Scene({ sources, colorVersion }: Props) {
         onViewStateChange={({ viewState }) => setViewState(viewState as MapViewState)}
         controller
         layers={layers}
+        
         // deck.gl mutates one metrics object in place, so copy it — otherwise
         // React sees the same reference and never re-renders.
         _onMetrics={m => setMetrics({ ...m })}
@@ -91,6 +97,7 @@ export function Scene({ sources, colorVersion }: Props) {
       <StatusOverlay text={status} />
       <CameraOverlay viewState={viewState} />
       <MetricsOverlay metrics={metrics} livePointCount={livePointCount} />
+      <div className="basemap-attribution">{BASEMAP_ATTRIBUTION}</div>
     </>
   )
 }
