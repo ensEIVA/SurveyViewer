@@ -6,6 +6,7 @@ import { CameraOverlay } from './CameraOverlay'
 import { DatasetSource, type SourceReport } from './DatasetSource'
 import { MetricsOverlay, type DeckMetrics } from './MetricsOverlay'
 import { StatusOverlay } from './StatusOverlay'
+import { VesselSource } from './VesselSource'
 import './Scene.css'
 
 const INITIAL_VIEW_STATE: MapViewState = {
@@ -26,8 +27,15 @@ export interface SceneSource {
   live: boolean
 }
 
+export interface SceneVessel {
+  vesselId: string
+  // For the status overlay.
+  name: string
+}
+
 interface Props {
   sources: SceneSource[]
+  vessels: SceneVessel[]
   // Changes when the shared colour mode changes, to reload tiles now.
   colorVersion: number
 }
@@ -38,18 +46,20 @@ interface Props {
 // Controlled view state (rather than DeckGL's initialViewState) so the
 // camera can be re-centred from code once a tileset reports where its data
 // actually is.
-export function Scene({ sources, colorVersion }: Props) {
+export function Scene({ sources, vessels, colorVersion }: Props) {
   const [viewState, setViewState] = useState<MapViewState>(INITIAL_VIEW_STATE)
   const [metrics, setMetrics] = useState<DeckMetrics | null>(null)
   const [reports, setReports] = useState<Record<string, SourceReport>>({})
   // One per scene: a layer instance can't be shared between DeckGL canvases.
   const basemap = useMemo(() => makeBasemapLayer(), [])
 
-  const onReport = useCallback((datasetId: string, report: SourceReport | null) => {
+  // Keyed by dataset id, or "vessel:<id>" for vessels (dataset ids can't
+  // contain a colon, so the two never collide).
+  const onReport = useCallback((key: string, report: SourceReport | null) => {
     setReports(prev => {
       const next = { ...prev }
-      if (report) next[datasetId] = report
-      else delete next[datasetId]
+      if (report) next[key] = report
+      else delete next[key]
       return next
     })
   }, [])
@@ -64,11 +74,17 @@ export function Scene({ sources, colorVersion }: Props) {
   }, [])
 
   // Basemap first: it must be drawn behind everything (see makeBasemapLayer).
-  const layers = [basemap, ...sources.flatMap(s => reports[s.datasetId]?.layers ?? [])]
-  const status =
-    sources.length === 0
-      ? 'no dataset — add one above'
-      : sources.map(s => `${s.name}: ${reports[s.datasetId]?.status ?? 'starting…'}`).join('\n')
+  // Vessels last, on top of the point clouds.
+  const layers = [
+    basemap,
+    ...sources.flatMap(s => reports[s.datasetId]?.layers ?? []),
+    ...vessels.flatMap(v => reports[`vessel:${v.vesselId}`]?.layers ?? []),
+  ]
+  const statusLines = [
+    ...sources.map(s => `${s.name}: ${reports[s.datasetId]?.status ?? 'starting…'}`),
+    ...vessels.map(v => `${v.name}: ${reports[`vessel:${v.vesselId}`]?.status ?? 'starting…'}`),
+  ]
+  const status = statusLines.length === 0 ? 'nothing to show — add a dataset or vessel above' : statusLines.join('\n')
   const livePointCount = sources.reduce((sum, s) => sum + (reports[s.datasetId]?.livePointCount ?? 0), 0)
 
   return (
@@ -82,6 +98,9 @@ export function Scene({ sources, colorVersion }: Props) {
           onReport={onReport}
           onTilesetCenter={onTilesetCenter}
         />
+      ))}
+      {vessels.map(v => (
+        <VesselSource key={v.vesselId} vesselId={v.vesselId} onReport={onReport} />
       ))}
       <DeckGL
         views={MAP_VIEW}

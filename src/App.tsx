@@ -3,6 +3,7 @@ import { ColorControls } from './components/ColorControls'
 import { ScenePane, type PaneConfig } from './components/ScenePane'
 import { useColorModes } from './hooks/useColorModes'
 import { useDatasets } from './hooks/useDatasets'
+import { useVessels } from './hooks/useVessels'
 import './App.css'
 
 const STORAGE_KEY = 'surveyviewer.panes'
@@ -11,13 +12,17 @@ const STORAGE_KEY = 'surveyviewer.panes'
 // may be opened over plain http on a LAN address.
 const newPaneId = () => `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`
 
-const newPane = (): PaneConfig => ({ id: newPaneId(), sources: [{ datasetId: null, live: true }] })
+const newPane = (): PaneConfig => ({ id: newPaneId(), sources: [{ datasetId: null, live: true }], vessels: [] })
 
-// Panes stored before scenes could hold several datasets had one dataset
-// directly on the pane.
-type StoredPane = PaneConfig | { id: string; datasetId: string | null; live: boolean }
+// Older stored layouts: before scenes could hold several datasets a pane had
+// one dataset directly on it, and before vessels it had no vessel list.
+type StoredPane =
+  | (Omit<PaneConfig, 'vessels'> & { vessels?: string[] })
+  | { id: string; datasetId: string | null; live: boolean }
 const upgradePane = (p: StoredPane): PaneConfig =>
-  'sources' in p ? p : { id: p.id, sources: [{ datasetId: p.datasetId, live: p.live }] }
+  'sources' in p
+    ? { ...p, vessels: p.vessels ?? [] }
+    : { id: p.id, sources: [{ datasetId: p.datasetId, live: p.live }], vessels: [] }
 
 // localStorage can throw (private mode, blocked storage) or hold something
 // stale; the layout is only a convenience, so fall back to one fresh pane.
@@ -41,6 +46,7 @@ function storePanes(panes: PaneConfig[]) {
 
 function App() {
   const datasets = useDatasets()
+  const vessels = useVessels()
   // Colour mode is shared server-side by every frontend, so it's chosen once
   // here, not per pane.
   const colorModes = useColorModes()
@@ -66,6 +72,7 @@ function App() {
             key={pane.id}
             pane={pane}
             datasets={datasets}
+            vessels={vessels}
             colorVersion={colorVersion}
             onChange={changed => updatePanes(panes.map(p => (p.id === changed.id ? changed : p)))}
             onClose={panes.length > 1 ? () => updatePanes(panes.filter(p => p.id !== pane.id)) : undefined}

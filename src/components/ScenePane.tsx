@@ -1,7 +1,8 @@
 import type { DatasetDescriptor } from '../gen/nexus/v1/nexus_service_pb'
 import type { Datasets } from '../hooks/useDatasets'
+import type { Vessels } from '../hooks/useVessels'
 import { DatasetPicker } from './DatasetPicker'
-import { Scene, type SceneSource } from './Scene'
+import { Scene, type SceneSource, type SceneVessel } from './Scene'
 import './ScenePane.css'
 
 export interface SourceConfig {
@@ -13,11 +14,14 @@ export interface SourceConfig {
 export interface PaneConfig {
   id: string
   sources: SourceConfig[]
+  // Vessel ids shown in this pane.
+  vessels: string[]
 }
 
 interface Props {
   pane: PaneConfig
   datasets: Datasets
+  vessels: Vessels
   colorVersion: number
   onChange: (pane: PaneConfig) => void
   // Absent when this is the last pane, which can't be closed.
@@ -39,9 +43,10 @@ function resolveSources(sources: SourceConfig[], available: DatasetDescriptor[])
   })
 }
 
-// One scene plus its own controls: which datasets it draws, and for each,
-// whether to stream its live points. Nothing here is shared with other panes.
-export function ScenePane({ pane, datasets, colorVersion, onChange, onClose }: Props) {
+// One scene plus its own controls: which datasets it draws (and for each,
+// whether to stream its live points) and which vessels. Nothing here is shared
+// with other panes.
+export function ScenePane({ pane, datasets, vessels, colorVersion, onChange, onClose }: Props) {
   const available = datasets.state === 'ready' ? datasets.datasets : []
   const resolved = resolveSources(pane.sources, available)
   const usedIds = new Set(resolved.map(r => r.dataset.datasetId))
@@ -57,6 +62,17 @@ export function ScenePane({ pane, datasets, colorVersion, onChange, onClose }: P
     datasetId: dataset.datasetId,
     name: dataset.displayName || dataset.datasetId,
     live: source.live,
+  }))
+
+  // Vessels Nexus still offers, each at most once; remembered ids that went
+  // stale are skipped rather than shown as errors.
+  const vesselList = vessels.state === 'ready' ? vessels.vessels : []
+  const shownVessels = vesselList.filter(v => pane.vessels.includes(v.vesselId))
+  const unusedVessels = vesselList.filter(v => !pane.vessels.includes(v.vesselId))
+  const setVessels = (ids: string[]) => onChange({ ...pane, vessels: ids })
+  const sceneVessels: SceneVessel[] = shownVessels.map(v => ({
+    vesselId: v.vesselId,
+    name: v.displayName || v.vesselId,
   }))
 
   return (
@@ -87,6 +103,39 @@ export function ScenePane({ pane, datasets, colorVersion, onChange, onClose }: P
             + dataset
           </button>
         )}
+        {vessels.state === 'loading' && <span>Vessels: loading…</span>}
+        {vessels.state === 'error' && <span>Vessels: {vessels.message}</span>}
+        {vessels.state === 'ready' && vesselList.length === 0 && <span>Vessels: none available</span>}
+        {shownVessels.map(vessel => (
+          <div className="scene-pane-source" key={vessel.vesselId}>
+            {/* Own vessel plus the ones not yet in this pane. */}
+            <select
+              value={vessel.vesselId}
+              onChange={e => setVessels(pane.vessels.map(id => (id === vessel.vesselId ? e.target.value : id)))}
+            >
+              {[vessel, ...unusedVessels].map(v => (
+                <option key={v.vesselId} value={v.vesselId}>
+                  {v.displayName || v.vesselId}
+                </option>
+              ))}
+            </select>
+            <button
+              onClick={() => setVessels(pane.vessels.filter(id => id !== vessel.vesselId))}
+              title="Remove vessel from this scene"
+            >
+              −
+            </button>
+          </div>
+        ))}
+        {vessels.state === 'ready' && (
+          <button
+            onClick={() => unusedVessels[0] && setVessels([...pane.vessels, unusedVessels[0].vesselId])}
+            disabled={unusedVessels.length === 0}
+            title="Add a vessel to this scene"
+          >
+            + vessel
+          </button>
+        )}
         {onClose && (
           <button className="scene-pane-close" onClick={onClose} title="Close scene">
             ✕
@@ -94,7 +143,7 @@ export function ScenePane({ pane, datasets, colorVersion, onChange, onClose }: P
         )}
       </header>
       <div className="scene-pane-body">
-        <Scene sources={sceneSources} colorVersion={colorVersion} />
+        <Scene sources={sceneSources} vessels={sceneVessels} colorVersion={colorVersion} />
       </div>
     </section>
   )
