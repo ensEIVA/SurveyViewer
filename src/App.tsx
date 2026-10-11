@@ -12,17 +12,23 @@ const STORAGE_KEY = 'surveyviewer.panes'
 // may be opened over plain http on a LAN address.
 const newPaneId = () => `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`
 
-const newPane = (): PaneConfig => ({ id: newPaneId(), sources: [{ datasetId: null, live: true }], vessels: [] })
+const newPane = (): PaneConfig => ({
+  id: newPaneId(),
+  sources: [{ datasetId: null, live: true }],
+  vessels: [],
+  followVesselId: null,
+})
 
 // Older stored layouts: before scenes could hold several datasets a pane had
-// one dataset directly on it, and before vessels it had no vessel list.
+// one dataset directly on it, and before vessels it had no vessel list or
+// followed vessel.
 type StoredPane =
-  | (Omit<PaneConfig, 'vessels'> & { vessels?: string[] })
+  | (Omit<PaneConfig, 'vessels' | 'followVesselId'> & { vessels?: string[]; followVesselId?: string | null })
   | { id: string; datasetId: string | null; live: boolean }
 const upgradePane = (p: StoredPane): PaneConfig =>
   'sources' in p
-    ? { ...p, vessels: p.vessels ?? [] }
-    : { id: p.id, sources: [{ datasetId: p.datasetId, live: p.live }], vessels: [] }
+    ? { ...p, vessels: p.vessels ?? [], followVesselId: p.followVesselId ?? null }
+    : { id: p.id, sources: [{ datasetId: p.datasetId, live: p.live }], vessels: [], followVesselId: null }
 
 // localStorage can throw (private mode, blocked storage) or hold something
 // stale; the layout is only a convenience, so fall back to one fresh pane.

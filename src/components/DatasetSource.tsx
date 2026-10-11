@@ -18,6 +18,8 @@ export interface SourceReport {
   layers: Layer[]
   status: string
   livePointCount: number
+  // Vessels only: where it is now, for the camera to follow.
+  position?: { longitude: number; latitude: number }
 }
 
 interface Props {

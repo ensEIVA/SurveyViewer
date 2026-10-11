@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import DeckGL from '@deck.gl/react'
 import { MapView, type MapViewState } from '@deck.gl/core'
 import { BASEMAP_ATTRIBUTION, makeBasemapLayer } from '../layers/basemapLayer'
@@ -19,6 +19,19 @@ const INITIAL_VIEW_STATE: MapViewState = {
 
 const MAP_VIEW = new MapView({ repeat: true })
 
+// Soft follow: the camera closes ~63% of the gap to the followed vessel per
+// this many seconds — smooth between position updates (~1 s apart) without
+// lagging far behind.
+const FOLLOW_TIME_CONSTANT_S = 0.5
+
+// After the user stops panning, how long the camera stays where they left it
+// before gliding back to the followed vessel.
+const FOLLOW_RESUME_AFTER_MS = 2_000
+
+// Shortest signed longitude difference, so following across the ±180°
+// meridian doesn't swing the camera the long way round the earth.
+const longitudeDelta = (from: number, to: number) => ((((to - from + 540) % 360) + 360) % 360) - 180
+
 export interface SceneSource {
   datasetId: string
   // For the status overlay.
@@ -38,6 +51,8 @@ interface Props {
   vessels: SceneVessel[]
   // Changes when the shared colour mode changes, to reload tiles now.
   colorVersion: number
+  // The vessel the camera softly follows, if any; one of `vessels`.
+  followVesselId: string | null
 }
 
 // One 3D view drawing one or more datasets together. Several scenes can be
@@ -46,7 +61,7 @@ interface Props {
 // Controlled view state (rather than DeckGL's initialViewState) so the
 // camera can be re-centred from code once a tileset reports where its data
 // actually is.
-export function Scene({ sources, vessels, colorVersion }: Props) {
+export function Scene({ sources, vessels, colorVersion, followVesselId }: Props) {
   const [viewState, setViewState] = useState<MapViewState>(INITIAL_VIEW_STATE)
   const [metrics, setMetrics] = useState<DeckMetrics | null>(null)
   const [reports, setReports] = useState<Record<string, SourceReport>>({})
@@ -72,6 +87,37 @@ export function Scene({ sources, vessels, colorVersion }: Props) {
     hasCenteredCamera.current = true
     setViewState(vs => ({ ...vs, longitude, latitude, zoom: Number.isFinite(zoom) ? zoom : vs.zoom }))
   }, [])
+
+  // Soft follow: every frame, move the camera's centre a fraction of the way
+  // to the vessel (exponential smoothing, frame-rate independent). Zoom,
+  // pitch and bearing stay the user's. Once converged, setViewState returns
+  // the same object, so React skips the re-render.
+  //
+  // Panning by hand pauses it rather than fighting the user: while they pan,
+  // and for FOLLOW_RESUME_AFTER_MS after, the camera stays theirs; then it
+  // glides back. Zoom and rotate don't move the centre, so they don't pause.
+  const isPanning = useRef(false)
+  const lastPanAt = useRef(0)
+  const followTarget = followVesselId ? reports[`vessel:${followVesselId}`]?.position : undefined
+  useEffect(() => {
+    if (!followTarget) return
+    let raf = 0
+    let last = performance.now()
+    const step = (now: number) => {
+      const k = 1 - Math.exp(-(now - last) / 1000 / FOLLOW_TIME_CONSTANT_S)
+      last = now
+      raf = requestAnimationFrame(step)
+      if (isPanning.current || now - lastPanAt.current < FOLLOW_RESUME_AFTER_MS) return
+      setViewState(vs => {
+        const dLon = longitudeDelta(vs.longitude, followTarget.longitude)
+        const dLat = followTarget.latitude - vs.latitude
+        if (Math.abs(dLon) < 1e-9 && Math.abs(dLat) < 1e-9) return vs
+        return { ...vs, longitude: vs.longitude + dLon * k, latitude: vs.latitude + dLat * k }
+      })
+    }
+    raf = requestAnimationFrame(step)
+    return () => cancelAnimationFrame(raf)
+  }, [followTarget])
 
   // Basemap first: it must be drawn behind everything (see makeBasemapLayer).
   // Vessels last, on top of the point clouds.
@@ -106,6 +152,11 @@ export function Scene({ sources, vessels, colorVersion }: Props) {
         views={MAP_VIEW}
         viewState={viewState}
         onViewStateChange={({ viewState }) => setViewState(viewState as MapViewState)}
+        // Pauses soft follow while the user pans (see the follow effect).
+        onInteractionStateChange={({ isPanning: panning = false }) => {
+          if (isPanning.current && !panning) lastPanAt.current = performance.now()
+          isPanning.current = panning
+        }}
         controller
         layers={layers}
         

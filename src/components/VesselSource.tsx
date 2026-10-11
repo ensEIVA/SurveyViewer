@@ -45,8 +45,9 @@ export const VesselSource = memo(function VesselSource({ vesselId, onReport }: P
   }
 
   useEffect(() => {
-    onReport(reportKey(vesselId), { layers, status, livePointCount: 0 })
-  }, [vesselId, layers, status, onReport])
+    const where = position ? { longitude: position.longitude, latitude: position.latitude } : undefined
+    onReport(reportKey(vesselId), { layers, status, livePointCount: 0, position: where })
+  }, [vesselId, layers, status, position, onReport])
   useEffect(() => () => onReport(reportKey(vesselId), null), [vesselId, onReport])
 
   return null

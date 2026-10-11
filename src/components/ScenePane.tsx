@@ -16,6 +16,8 @@ export interface PaneConfig {
   sources: SourceConfig[]
   // Vessel ids shown in this pane.
   vessels: string[]
+  // The vessel the camera softly follows, if any; one of `vessels`.
+  followVesselId: string | null
 }
 
 interface Props {
@@ -69,11 +71,27 @@ export function ScenePane({ pane, datasets, vessels, colorVersion, onChange, onC
   const vesselList = vessels.state === 'ready' ? vessels.vessels : []
   const shownVessels = vesselList.filter(v => pane.vessels.includes(v.vesselId))
   const unusedVessels = vesselList.filter(v => !pane.vessels.includes(v.vesselId))
-  const setVessels = (ids: string[]) => onChange({ ...pane, vessels: ids })
   const sceneVessels: SceneVessel[] = shownVessels.map(v => ({
     vesselId: v.vesselId,
     name: v.displayName || v.vesselId,
   }))
+  // Only follow a vessel that's actually shown here.
+  const followVesselId = shownVessels.some(v => v.vesselId === pane.followVesselId) ? pane.followVesselId : null
+  const setFollow = (vesselId: string | null) => onChange({ ...pane, followVesselId: vesselId })
+  const replaceVessel = (oldId: string, newId: string) =>
+    onChange({
+      ...pane,
+      vessels: pane.vessels.map(id => (id === oldId ? newId : id)),
+      // Swapping the followed vessel for another keeps following the new one.
+      followVesselId: pane.followVesselId === oldId ? newId : pane.followVesselId,
+    })
+  const removeVessel = (vesselId: string) =>
+    onChange({
+      ...pane,
+      vessels: pane.vessels.filter(id => id !== vesselId),
+      followVesselId: pane.followVesselId === vesselId ? null : pane.followVesselId,
+    })
+  const addVessel = () => unusedVessels[0] && onChange({ ...pane, vessels: [...pane.vessels, unusedVessels[0].vesselId] })
 
   return (
     <section className="scene-pane">
@@ -109,27 +127,29 @@ export function ScenePane({ pane, datasets, vessels, colorVersion, onChange, onC
         {shownVessels.map(vessel => (
           <div className="scene-pane-source" key={vessel.vesselId}>
             {/* Own vessel plus the ones not yet in this pane. */}
-            <select
-              value={vessel.vesselId}
-              onChange={e => setVessels(pane.vessels.map(id => (id === vessel.vesselId ? e.target.value : id)))}
-            >
+            <select value={vessel.vesselId} onChange={e => replaceVessel(vessel.vesselId, e.target.value)}>
               {[vessel, ...unusedVessels].map(v => (
                 <option key={v.vesselId} value={v.vesselId}>
                   {v.displayName || v.vesselId}
                 </option>
               ))}
             </select>
-            <button
-              onClick={() => setVessels(pane.vessels.filter(id => id !== vessel.vesselId))}
-              title="Remove vessel from this scene"
-            >
+            <label title="Camera softly follows this vessel; after you pan away it glides back">
+              <input
+                type="checkbox"
+                checked={followVesselId === vessel.vesselId}
+                onChange={e => setFollow(e.target.checked ? vessel.vesselId : null)}
+              />{' '}
+              follow
+            </label>
+            <button onClick={() => removeVessel(vessel.vesselId)} title="Remove vessel from this scene">
               −
             </button>
           </div>
         ))}
         {vessels.state === 'ready' && (
           <button
-            onClick={() => unusedVessels[0] && setVessels([...pane.vessels, unusedVessels[0].vesselId])}
+            onClick={addVessel}
             disabled={unusedVessels.length === 0}
             title="Add a vessel to this scene"
           >
@@ -143,7 +163,12 @@ export function ScenePane({ pane, datasets, vessels, colorVersion, onChange, onC
         )}
       </header>
       <div className="scene-pane-body">
-        <Scene sources={sceneSources} vessels={sceneVessels} colorVersion={colorVersion} />
+        <Scene
+          sources={sceneSources}
+          vessels={sceneVessels}
+          colorVersion={colorVersion}
+          followVesselId={followVesselId}
+        />
       </div>
     </section>
   )
