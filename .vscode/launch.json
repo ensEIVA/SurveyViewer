@@ -1,0 +1,16 @@
+{
+    // F5: starts Vite (if it isn't running yet) and opens Chrome with the
+    // debugger attached, so breakpoints in src/**/*.ts(x) bind via Vite's
+    // source maps.
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "Launch Chrome against localhost:2008",
+            "url": "http://localhost:2008",
+            "webRoot": "${workspaceFolder}",
+            "preLaunchTask": "vite dev"
+        }
+    ]
+}

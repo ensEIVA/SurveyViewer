@@ -1,0 +1,22 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            // Starts Vite for the debugger, and counts as ready once Vite
+            // prints its local url. Left running between debug sessions.
+            // Patterns kept loose: Vite colours parts of those lines.
+            "label": "vite dev",
+            "type": "npm",
+            "script": "dev",
+            "isBackground": true,
+            "problemMatcher": {
+                "owner": "vite",
+                "pattern": { "regexp": "^__never_matches__$" },
+                "background": {
+                    "beginsPattern": "VITE",
+                    "endsPattern": "Local:"
+                }
+            }
+        }
+    ]
+}
