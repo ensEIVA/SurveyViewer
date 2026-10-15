@@ -105,8 +105,24 @@ const MAX_SAMPLES = 20_000
 // Recorded samples per stream, e.g. "vessel:A" or "points:survey-a".
 // Module-level so every hook records into the same place; also reachable
 // as window.__streamLog from the devtools console.
-class StreamLog {
+export class StreamLog {
   private streams = new Map<string, Sample[]>()
+  private open = new Set<string>()
+
+  // Claims a name for one open stream. Two panes showing the same dataset
+  // each open their own stream; merging their samples would double the rate
+  // and hide gaps, so the second gets "name#2". Closing frees the name, and
+  // reopening continues its samples (the pause then shows as a gap).
+  claim(name: string): string {
+    let key = name
+    for (let n = 2; this.open.has(key); n++) key = `${name}#${n}`
+    this.open.add(key)
+    return key
+  }
+
+  release(key: string) {
+    this.open.delete(key)
+  }
 
   record(stream: string, sample: Sample) {
     let samples = this.streams.get(stream)

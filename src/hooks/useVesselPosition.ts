@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { timestampDate } from '@bufbuild/protobuf/wkt'
 import { runReconnectingStream } from '../lib/reconnectingStream'
+import { streamLog } from '../lib/streamStats'
 import { nexusClient } from '../services/nexusClient'
 
 export interface VesselPosition {
@@ -31,9 +32,14 @@ export function useVesselPosition(vesselId: string): VesselPositionStream {
 
   useEffect(() => {
     const abort = new AbortController()
+    const logKey = streamLog.claim(`vessel:${vesselId}`)
     runReconnectingStream({
       open: signal => nexusClient.getVesselPosition({ vesselId }, { signal }),
       onMessage: res => {
+        streamLog.record(logKey, {
+          receivedAt: Date.now(),
+          measuredAt: res.timestamp ? timestampDate(res.timestamp).getTime() : null,
+        })
         setPosition({
           longitude: res.posLongitude,
           latitude: res.posLatitude,
@@ -49,7 +55,10 @@ export function useVesselPosition(vesselId: string): VesselPositionStream {
       label: 'GetVesselPosition',
       signal: abort.signal,
     })
-    return () => abort.abort()
+    return () => {
+      abort.abort()
+      streamLog.release(logKey)
+    }
   }, [vesselId])
 
   return { position, connected }

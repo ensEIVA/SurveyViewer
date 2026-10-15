@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { findGaps, percentile, summarize, toCsv, type Sample } from './streamStats'
+import { findGaps, percentile, StreamLog, summarize, toCsv, type Sample } from './streamStats'
 
 // 1 Hz timestamps from t0, skipping the given seconds.
 const everySecond = (n: number, skip: number[] = [], t0 = 1_000_000) =>
@@ -62,6 +62,16 @@ describe('summarize', () => {
     const stats = summarize(samples, { factor: 3 })
     expect(stats.arrivalGaps).toEqual([])
     expect(stats.measuredGaps).toHaveLength(1)
+  })
+})
+
+describe('StreamLog.claim', () => {
+  it('keeps two open streams of the same name apart, and reuses a released name', () => {
+    const log = new StreamLog()
+    expect(log.claim('points:a')).toBe('points:a')
+    expect(log.claim('points:a')).toBe('points:a#2')
+    log.release('points:a')
+    expect(log.claim('points:a')).toBe('points:a')
   })
 })
 

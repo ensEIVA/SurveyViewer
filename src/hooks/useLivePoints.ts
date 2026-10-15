@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { decodeLivePoints, type LivePoints } from '../lib/livePoints'
 import { runReconnectingStream } from '../lib/reconnectingStream'
+import { streamLog } from '../lib/streamStats'
 import { nexusClient } from '../services/nexusClient'
 
 export interface LivePointsStream {
@@ -28,9 +29,12 @@ export function useLivePoints(datasetId: string, enabled: boolean): LivePointsSt
   useEffect(() => {
     if (!enabled) return
     const abort = new AbortController()
+    const logKey = streamLog.claim(`points:${datasetId}`)
     runReconnectingStream({
       open: signal => nexusClient.getLivePoints({ datasetId }, { signal }),
       onMessage: res => {
+        // No measuredAt: the contract gives live points no timestamp.
+        streamLog.record(logKey, { receivedAt: Date.now(), measuredAt: null, count: res.points?.count ?? 0 })
         setPoints(decodeLivePoints(res))
         setConnected(true)
       },
@@ -38,7 +42,10 @@ export function useLivePoints(datasetId: string, enabled: boolean): LivePointsSt
       label: 'GetLivePoints',
       signal: abort.signal,
     })
-    return () => abort.abort()
+    return () => {
+      abort.abort()
+      streamLog.release(logKey)
+    }
   }, [datasetId, enabled])
 
   // Hide the last snapshot while switched off rather than clearing state.
