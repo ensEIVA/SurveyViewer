@@ -2,11 +2,12 @@ import { Tile3DLayer, type Tile3DLayerProps } from '@deck.gl/geo-layers'
 import { Tiles3DLoader } from '@loaders.gl/3d-tiles'
 import type { TilesetSlot } from '../hooks/useLiveTileset'
 
-const TILE_CACHE_MB = 32
 const MAX_SCREEN_SPACE_ERROR = 4
-const MAX_TILES_SELECTED = 800
-const SELECTION_DEBOUNCE_MS = 150
-const MAX_CONCURRENT_TILE_REQUESTS = 12
+// Tuning experiment: switched off together with their loadOptions below.
+// const TILE_CACHE_MB = 32
+// const MAX_TILES_SELECTED = 800
+// const SELECTION_DEBOUNCE_MS = 150
+// const MAX_CONCURRENT_TILE_REQUESTS = 12
 
 type Callbacks = Pick<Tile3DLayerProps, 'onTilesetLoad' | 'onTileError'>
 
