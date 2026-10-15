@@ -13,3 +13,8 @@ export const ROOT_NODE_ID = '0'
 export const NODE_ENDPOINT_POLL_MS = 10000
 
 export const TILESET_POLL_MS = 5_000
+
+// Measurements panel: a pause counts as a gap when it's longer than this many
+// times the stream's median interval (3 on a 1 Hz stream: over 3 s). The
+// starting value; it can be changed in the panel while measuring.
+export const MEASUREMENT_GAP_FACTOR = 3

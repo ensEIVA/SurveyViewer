@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { ColorControls } from './components/ColorControls'
+import { MeasurementsPanel } from './components/MeasurementsPanel'
 import { ScenePane, type PaneConfig } from './components/ScenePane'
 import { useColorModes } from './hooks/useColorModes'
 import { useDatasets } from './hooks/useDatasets'
@@ -60,6 +61,7 @@ function App() {
   // which Nexus colours, instead of waiting for its next poll.
   const [colorVersion, setColorVersion] = useState(0)
   const [panes, setPanes] = useState<PaneConfig[]>(loadPanes)
+  const [showMeasurements, setShowMeasurements] = useState(false)
 
   const updatePanes = (next: PaneConfig[]) => {
     setPanes(next)
@@ -71,7 +73,9 @@ function App() {
       <header className="app-toolbar">
         <button onClick={() => updatePanes([...panes, newPane()])}>+ scene</button>
         <ColorControls modes={colorModes} onChanged={() => setColorVersion(v => v + 1)} />
+        <button onClick={() => setShowMeasurements(s => !s)}>measurements</button>
       </header>
+      {showMeasurements && <MeasurementsPanel onClose={() => setShowMeasurements(false)} />}
       <main className="scene-grid">
         {panes.map(pane => (
           <ScenePane

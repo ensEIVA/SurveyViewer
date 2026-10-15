@@ -1,0 +1,50 @@
+.measurements-panel {
+  position: fixed;
+  top: 32px;
+  right: 8px;
+  z-index: 10;
+  max-width: min(960px, calc(100vw - 16px));
+  max-height: calc(100vh - 48px);
+  overflow: auto;
+  font: 12px/1.4 monospace;
+  color: #eee;
+  background: rgba(20, 20, 20, 0.92);
+  padding: 8px 10px;
+  border-radius: 4px;
+}
+
+.measurements-panel header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+.measurements-panel input,
+.measurements-panel button {
+  font: inherit;
+}
+
+.measurements-panel input {
+  width: 4em;
+}
+
+.measurements-panel table {
+  margin-top: 8px;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+
+.measurements-panel th,
+.measurements-panel td {
+  padding: 2px 10px 2px 0;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.measurements-notes {
+  margin: 8px 0 0;
+  padding-left: 18px;
+  max-width: 80ch;
+  color: #bbb;
+}
