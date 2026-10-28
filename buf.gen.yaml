@@ -7,3 +7,6 @@ plugins:
   - local: protoc-gen-es
     out: src/gen
     opt: target=ts
+    # The topics are read through the Fletcher gateway, not gRPC.
+    exclude_types:
+      - nexus.topics.v1
