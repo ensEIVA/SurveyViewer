@@ -5,6 +5,11 @@
 // .env.local (VITE_API_URL=http://<host>:<port>).
 export const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:5007'
 
+// Fletcher gateway — where the live-point and vessel-position topics come
+// from, bridged from Nexus over DDS. Runs on this machine by default;
+// override via .env.local (VITE_GATEWAY_URL=ws://<host>:<port>).
+export const GATEWAY_URL = import.meta.env.VITE_GATEWAY_URL ?? 'ws://localhost:9090'
+
 // Node, within the chosen dataset, whose description endpoint (tileset url)
 // is asked for at startup.
 export const ROOT_NODE_ID = '0'
