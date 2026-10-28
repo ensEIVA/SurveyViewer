@@ -9,7 +9,7 @@
     "lint": "oxlint",
     "test": "vitest run",
     "preview": "vite preview",
-    "generate": "buf generate"
+    "generate": "buf generate && protoc --fletcher_opt=ts --fletcher_out=src/gen -I proto proto/nexus/v1/nexus_topics.proto"
   },
   "dependencies": {
     "@bufbuild/protobuf": "^2.16.0",
@@ -20,6 +20,7 @@
     "@deck.gl/layers": "^9.4.0",
     "@deck.gl/mesh-layers": "^9.4.0",
     "@deck.gl/react": "^9.4.0",
+    "@eiva/fletcher-gateway-client": "0.5.0-alpha",
     "@loaders.gl/3d-tiles": "^4.5.2",
     "@loaders.gl/core": "^4.5.2",
     "react": "^19.2.8",
@@ -28,6 +29,8 @@
   "devDependencies": {
     "@bufbuild/buf": "^1.73.0",
     "@bufbuild/protoc-gen-es": "^2.16.0",
+    "@eiva/protoc-gen-fletcher": "0.5.1-alpha",
+    "@protobuf-ts/protoc": "2.11.1",
     "@types/node": "^24.13.3",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.7",

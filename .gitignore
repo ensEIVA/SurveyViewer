@@ -24,3 +24,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# C++ headers protoc-gen-fletcher writes beside its TypeScript; unused here.
+src/gen/**/*.pb.h
