@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react'
-import { timestampDate } from '@bufbuild/protobuf/wkt'
-import { runReconnectingStream } from '../lib/reconnectingStream'
+import { VesselPosition as VesselPositionRow, VesselPositions_PositionTopic } from '../gen/nexus/v1/nexus_topics.fletcher'
 import { streamLog } from '../lib/streamStats'
-import { nexusClient } from '../services/nexusClient'
+import { gateway } from '../services/gateway'
 
 export interface VesselPosition {
   longitude: number
@@ -20,43 +19,42 @@ export interface VesselPosition {
 export interface VesselPositionStream {
   // The newest position; kept while reconnecting.
   position: VesselPosition | null
-  // False while the stream is down and waiting to reopen.
+  // False while the gateway connection is down.
   connected: boolean
 }
 
-// Subscribes to one vessel's position stream, reopening it with backoff if
-// it ends. Aborted on unmount, like useLivePoints and for the same reasons.
+// Follows one vessel on the Fletcher gateway's vessel-positions topic. The
+// topic carries every vessel, so rows for other vessels are skipped. Nexus
+// publishes a position only when it changes, so nothing shows until the
+// vessel's next update. The subscription is dropped on unmount.
 export function useVesselPosition(vesselId: string): VesselPositionStream {
   const [position, setPosition] = useState<VesselPosition | null>(null)
   const [connected, setConnected] = useState(false)
 
   useEffect(() => {
-    const abort = new AbortController()
     const logKey = streamLog.claim(`vessel:${vesselId}`)
-    runReconnectingStream({
-      open: signal => nexusClient.getVesselPosition({ vesselId }, { signal }),
-      onMessage: res => {
-        streamLog.record(logKey, {
-          receivedAt: Date.now(),
-          measuredAt: res.timestamp ? timestampDate(res.timestamp).getTime() : null,
-        })
+    const unsubscribe = gateway.subscribe(
+      VesselPositions_PositionTopic,
+      VesselPositionRow,
+      row => {
+        if (row.vessel_id !== vesselId) return
+        // Nanoseconds since the epoch; 0 means unset.
+        const measuredAt = row.timestamp > 0n ? new Date(Number(row.timestamp / 1_000_000n)) : null
+        streamLog.record(logKey, { receivedAt: Date.now(), measuredAt: measuredAt?.getTime() ?? null })
         setPosition({
-          longitude: res.posLongitude,
-          latitude: res.posLatitude,
-          height: res.posHeight,
-          roll: res.rotRoll,
-          pitch: res.rotPitch,
-          heading: res.rotYaw,
-          measuredAt: res.timestamp ? timestampDate(res.timestamp) : null,
+          longitude: row.pos_longitude,
+          latitude: row.pos_latitude,
+          height: row.pos_height,
+          roll: row.rot_roll,
+          pitch: row.rot_pitch,
+          heading: row.rot_yaw,
+          measuredAt,
         })
-        setConnected(true)
       },
-      onDisconnected: () => setConnected(false),
-      label: 'GetVesselPosition',
-      signal: abort.signal,
-    })
+      setConnected,
+    )
     return () => {
-      abort.abort()
+      unsubscribe()
       streamLog.release(logKey)
     }
   }, [vesselId])
