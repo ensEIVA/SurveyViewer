@@ -1,4 +1,4 @@
-import type { GetLivePointsResponse, PointSet } from '../gen/nexus/v1/nexus_service_pb'
+import type { ILivePointsSnapshot } from '../gen/nexus/v1/nexus_topics.fletcher'
 
 export interface DecodedPointSet {
   count: number
@@ -14,7 +14,7 @@ export interface LivePoints {
   // [longitude, latitude, height] of the dataset's GeoReference — deck.gl's
   // METER_OFFSETS anchor, the same frame the tilesets use.
   coordinateOrigin: [number, number, number]
-  // Translation by the response's origin: positions are float32 offsets from
+  // Translation by the snapshot's origin: positions are float32 offsets from
   // it (keeps them small enough for float32 to stay precise).
   modelMatrix: Matrix4
 }
@@ -27,36 +27,30 @@ export type Matrix4 = [
   number, number, number, number,
 ]
 
-const EMPTY: DecodedPointSet = { count: 0, positions: new Float32Array(0), colors: new Uint8Array(0) }
-
-function decodePointSet(set: PointSet | undefined, name: string): DecodedPointSet {
-  if (!set) return EMPTY
-  const { count, positions, colors } = set
+function decodePointSet(count: number, positions: Uint8Array, colors: Uint8Array, name: string): DecodedPointSet {
   if (positions.byteLength !== count * 3 * 4) {
     throw new Error(`${name}: ${positions.byteLength} position bytes for ${count} points, expected ${count * 12}`)
   }
   if (colors.byteLength !== count * 3) {
     throw new Error(`${name}: ${colors.byteLength} color bytes for ${count} points, expected ${count * 3}`)
   }
+  // A Float32Array needs a 4-byte-aligned offset. The Fletcher decoder
+  // copies each bytes field into a buffer of its own, so it normally is,
+  // and the points are used in place; otherwise they're copied first. The
+  // data is little-endian, which every browser platform is natively.
+  const aligned = positions.byteOffset % 4 === 0 ? positions : positions.slice()
   return {
     count,
-    // slice() first: protobuf bytes are a view into the whole response
-    // buffer at whatever offset the field happened to land, and a
-    // Float32Array needs a 4-byte-aligned buffer of its own. The data is
-    // little-endian, which every browser platform is natively.
-    positions: new Float32Array(positions.slice().buffer),
+    positions: new Float32Array(aligned.buffer, aligned.byteOffset, count * 3),
     colors,
   }
 }
 
-export function decodeLivePoints(res: GetLivePointsResponse): LivePoints {
-  const geo = res.geoReference
-  if (!geo) throw new Error('GetLivePoints response has no geo_reference')
-  const origin = res.origin ?? { x: 0, y: 0, z: 0 }
+export function decodeLivePoints(row: ILivePointsSnapshot): LivePoints {
   return {
-    points: decodePointSet(res.points, 'points'),
-    clock: decodePointSet(res.clock, 'clock'),
-    coordinateOrigin: [geo.longitudeDegrees, geo.latitudeDegrees, geo.heightMeters],
-    modelMatrix: [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, origin.x, origin.y, origin.z, 1],
+    points: decodePointSet(row.point_count, row.point_positions, row.point_colors, 'points'),
+    clock: decodePointSet(row.clock_point_count, row.clock_positions, row.clock_colors, 'clock'),
+    coordinateOrigin: [row.geo_longitude_degrees, row.geo_latitude_degrees, row.geo_height_meters],
+    modelMatrix: [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, row.origin_x, row.origin_y, row.origin_z, 1],
   }
 }

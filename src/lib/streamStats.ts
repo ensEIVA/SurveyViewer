@@ -5,7 +5,8 @@
 // Two clocks are involved, and only one of them is ours:
 // - receivedAt: the browser's clock when a message arrived. Always known.
 // - measuredAt: the sender's timestamp of when the data was measured, if
-//   the message carries one (vessel positions do, live points don't).
+//   the message carries one. Vessel positions carry when they were
+//   measured; live points when Nexus took the snapshot.
 // Latency is receivedAt - measuredAt, so it is only meaningful if both
 // machines' clocks agree and the sender stamps real measurement time. A
 // replay that keeps the original recording timestamps shows a huge,

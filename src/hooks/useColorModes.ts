@@ -31,7 +31,7 @@ export function useColorModes(): ColorModes {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    // Cancelled flag rather than aborting: see useLivePoints.
+    // Cancelled flag rather than aborting: see useNodeDescriptionEndpoint.
     let cancelled = false
     nexusClient
       .getColorModes({})

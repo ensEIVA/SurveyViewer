@@ -1,49 +1,49 @@
 import { useEffect, useState } from 'react'
+import { LivePointsSnapshot, LivePoints_SnapshotTopic } from '../gen/nexus/v1/nexus_topics.fletcher'
 import { decodeLivePoints, type LivePoints } from '../lib/livePoints'
-import { runReconnectingStream } from '../lib/reconnectingStream'
 import { streamLog } from '../lib/streamStats'
-import { nexusClient } from '../services/nexusClient'
+import { gateway } from '../services/gateway'
 
 export interface LivePointsStream {
   // The newest snapshot; kept while reconnecting, so the overlay doesn't blank.
   points: LivePoints | null
-  // False while the stream is down and waiting to reopen.
+  // False while the gateway connection is down.
   connected: boolean
 }
 
-// Subscribes to Nexus's live-points stream: Nexus sends the latest snapshot
-// straight away, then a new one on its own timer. If the stream ever ends
-// (Nexus restart, network drop) it's reopened with backoff.
+// Follows one dataset on the Fletcher gateway's live-points topic: Nexus
+// publishes a snapshot of every dataset on its own timer (one second by
+// default), so rows for other datasets are skipped, and nothing shows until
+// the next snapshot.
 //
-// Unlike the polling hooks, unmount aborts the stream: an open stream is a
-// held connection, and leaving it running would leak one per remount. In dev,
-// StrictMode's mount-unmount-remount therefore opens and immediately cancels a
-// first stream — Nexus has to tolerate that, as it must any closed tab.
-//
-// `enabled: false` closes the stream (or never opens it): a pane without live
-// points holds no connection and receives nothing.
+// `enabled: false` drops the subscription (or never makes it): a pane
+// without live points receives nothing for it. Rows still reach the browser
+// while any other pane shows live points of any dataset.
 export function useLivePoints(datasetId: string, enabled: boolean): LivePointsStream {
   const [points, setPoints] = useState<LivePoints | null>(null)
   const [connected, setConnected] = useState(false)
 
   useEffect(() => {
     if (!enabled) return
-    const abort = new AbortController()
     const logKey = streamLog.claim(`points:${datasetId}`)
-    runReconnectingStream({
-      open: signal => nexusClient.getLivePoints({ datasetId }, { signal }),
-      onMessage: res => {
-        // No measuredAt: the contract gives live points no timestamp.
-        streamLog.record(logKey, { receivedAt: Date.now(), measuredAt: null, count: res.points?.count ?? 0 })
-        setPoints(decodeLivePoints(res))
-        setConnected(true)
+    const unsubscribe = gateway.subscribe(
+      LivePoints_SnapshotTopic,
+      LivePointsSnapshot,
+      row => {
+        if (row.dataset_id !== datasetId) return
+        // Nanoseconds since the epoch, by Nexus's clock; 0 means unset.
+        const takenAt = row.taken_at > 0n ? Number(row.taken_at / 1_000_000n) : null
+        streamLog.record(logKey, { receivedAt: Date.now(), measuredAt: takenAt, count: row.point_count })
+        try {
+          setPoints(decodeLivePoints(row))
+        } catch (err) {
+          console.warn('[viewer] Malformed live points snapshot', err)
+        }
       },
-      onDisconnected: () => setConnected(false),
-      label: 'GetLivePoints',
-      signal: abort.signal,
-    })
+      setConnected,
+    )
     return () => {
-      abort.abort()
+      unsubscribe()
       streamLog.release(logKey)
     }
   }, [datasetId, enabled])
