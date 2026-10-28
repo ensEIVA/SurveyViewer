@@ -1,6 +1,6 @@
 # SurveyViewer
 
-Browser 3D viewer for live survey point clouds and vessels. React + TypeScript + deck.gl. Talks only to **Nexus**.
+Browser 3D viewer for live survey point clouds and vessels. React + TypeScript + deck.gl. Talks to **Nexus**, and to a **Fletcher gateway** on this machine for its live data.
 
 ## Status
 
@@ -26,15 +26,17 @@ Browser 3D viewer for live survey point clouds and vessels. React + TypeScript +
 ## Network
 
 ```
-Browser ──gRPC-Web──▶ Nexus   lists, colour mode, tileset URL
-        ◀─stream────  Nexus   live points, vessel positions (1 stream each, auto-reconnect)
-        ──HTTP GET──▶ Nexus   tileset.json + .pnts (deck.gl loads these itself, browser-cached)
-        ──HTTP GET──▶ Esri    basemap tiles (internet)
+Browser ──gRPC-Web──▶ Nexus     lists, colour mode, tileset URL
+        ◀─WebSocket─  Fletcher  live points, vessel positions (topics, bridged from Nexus over DDS)
+        ──HTTP GET──▶ Nexus     tileset.json + .pnts (deck.gl loads these itself, browser-cached)
+        ──HTTP GET──▶ Esri      basemap tiles (internet)
 ```
 
-- **gRPC-Web** (Connect, binary protobuf) for commands, queries and streams. Contract: `proto/nexus/v1/nexus_service.proto`, client generated into `src/gen/` (`npm run generate`).
+- **gRPC-Web** (Connect, binary protobuf) for commands and queries. Contract: `proto/nexus/v1/nexus_service.proto`, client generated into `src/gen/` by buf. Its `GetLivePoints` and `GetVesselPosition` streams are still served but unused.
+- **Fletcher gateway** (WebSocket, `@eiva/fletcher-gateway-client`) for the live data: Nexus publishes on DDS, the gateway bridges it to the browser. One shared connection (`src/services/gateway.ts`) subscribes each topic once, checks itself every 2 s and reconnects with backoff. Each topic carries every dataset or vessel; the viewer keeps the rows it shows. Contract: `proto/nexus/v1/nexus_topics.proto`, row schemas generated into `src/gen/` by `protoc-gen-fletcher`, as the backend does.
 - **Plain HTTP** for tiles: the 3D Tiles standard is URL-based, and `GET` keeps browser caching.
-- Each open stream uses one of the browser's 6 connections to Nexus.
+
+`npm run generate` regenerates both from `proto/`.
 
 ## Run
 
@@ -43,4 +45,6 @@ npm install
 npm run dev        # http://localhost:2008 — Nexus' CORS allows only this origin
 ```
 
-Nexus address: `VITE_API_URL` in `.env.local` (default `http://localhost:5007`).
+Needs a Fletcher gateway bridging Nexus's DDS domain, e.g. `gateway --port 9090 --provider fastdds --domain-id <Nexus's domain>` ([releases](https://github.com/eivacom/Fletcher/releases?q=gateway)).
+
+Addresses in `.env.local`: Nexus `VITE_API_URL` (default `http://localhost:5007`), gateway `VITE_GATEWAY_URL` (default `ws://localhost:9090`).
