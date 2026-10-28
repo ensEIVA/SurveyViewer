@@ -1,0 +1,80 @@
+syntax = "proto3";
+
+// The topics Nexus publishes to the GUI over Fletcher, through a Fletcher gateway, in place of the GetLivePoints and
+// GetVesselPosition streams of nexus_service.proto (which stay, so the GUI can go back to them). A topic is a service
+// method that takes a stream of rows; its key is "<package>/<service>/<method>", e.g. "nexus.topics.v1/LivePoints/Snapshot".
+// Every field is a plain value rather than a nested message, so a subscriber reading the Arrow batches gets one flat
+// column per field. The fields mean what their counterparts in nexus_service.proto mean.
+//
+// Every dataset and every vessel is published all the time: unlike a gRPC stream, a topic does not tell Nexus who is
+// listening. A subscriber keeps the rows for the dataset or vessel it shows and ignores the rest.
+package nexus.topics.v1;
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+// nexus.topics.v1/LivePoints/Snapshot: one row per dataset per interval (one second by default), as GetLivePoints sends.
+service LivePoints {
+    rpc Snapshot(stream LivePointsSnapshot) returns (google.protobuf.Empty);
+}
+
+// nexus.topics.v1/VesselPositions/Position: one row each time a vessel's position is updated, as GetVesselPosition
+// sends. Nexus checks each vessel up to ten times a second.
+service VesselPositions {
+    rpc Position(stream VesselPosition) returns (google.protobuf.Empty);
+}
+
+// The points Surge ingested most recently into one dataset, coloured, plus a clock showing when they were taken.
+// Positions are in the dataset's local frame: metres East (X), North (Y) and Up (Z) of the georeference, the same frame
+// the tilesets use, stored as float32 offsets from origin. In deck.gl: coordinateSystem METER_OFFSETS, coordinateOrigin
+// = [geo_longitude_degrees, geo_latitude_degrees, geo_height_meters], modelMatrix = a translation by origin; then the
+// binary columns can be used directly as typed arrays.
+message LivePointsSnapshot {
+    // One of GetAvailableDatasetsResponse's dataset ids.
+    string dataset_id = 1;
+    // When Nexus took the snapshot, by its own clock; the clock points show this time.
+    google.protobuf.Timestamp taken_at = 2;
+
+    // Where the dataset's local frame sits on the globe: WGS84 degrees, and metres above the WGS84 ellipsoid.
+    double geo_latitude_degrees = 3;
+    double geo_longitude_degrees = 4;
+    double geo_height_meters = 5;
+
+    // What point_positions and clock_positions are offsets from, in the local frame.
+    double origin_x = 6;
+    double origin_y = 7;
+    double origin_z = 8;
+
+    // The most recently ingested points (up to 300,000), coloured with the current colour mode (see SetColorMode).
+    uint32 point_count = 9;
+    // point_count x 3 little-endian float32: X, Y, Z of each point, relative to origin.
+    bytes point_positions = 10;
+    // point_count x 3 uint8: R, G, B of each point.
+    bytes point_colors = 11;
+
+    // HH:mm:ss of taken_at, drawn in magenta points 30 m above the points; the same layout as the points.
+    uint32 clock_point_count = 12;
+    bytes clock_positions = 13;
+    bytes clock_colors = 14;
+}
+
+// Where a vessel was, and how it was oriented, at one moment. Angles follow the usual maritime convention.
+message VesselPosition {
+    // One of GetAvailableVesselsResponse's vessel ids.
+    string vessel_id = 1;
+    // WGS84, degrees, east positive.
+    double pos_longitude = 2;
+    // WGS84, degrees, north positive.
+    double pos_latitude = 3;
+    // Metres above the WGS84 ellipsoid (not mean sea level), the same reference as the datasets' georeferences.
+    double pos_height = 4;
+    // Degrees, positive with starboard down.
+    double rot_roll = 5;
+    // Degrees, positive with the bow up.
+    double rot_pitch = 6;
+    // Degrees clockwise from true north (the vessel's heading), 0 to 360.
+    double rot_yaw = 7;
+    // When the position was measured, not when it was published.
+    google.protobuf.Timestamp timestamp = 8;
+}
+ 

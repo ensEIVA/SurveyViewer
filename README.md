@@ -1,32 +1,46 @@
-# React + TypeScript + Vite
+# SurveyViewer
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Browser 3D viewer for live survey point clouds and vessels. React + TypeScript + deck.gl. Talks only to **Nexus**.
 
-Currently, two official plugins are available:
+## Status
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- Branch `feature/datasets`, running against Nexus on a colleague's machine. No automated tests yet.
+- Open in the contract: vessel height reference (ellipsoid vs sea level) and update rate.
+- `npm run build` fails: unused constants in `src/layers/tilesetLayer.ts` (tile-tuning experiment).
+- Spike AB#21307 (deck.gl over gRPC): answered — tiles stay on HTTP; posting the conclusion is pending.
 
-## React Compiler
+## Features
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+| Feature | How |
+|---|---|
+| Scenes | Several side-by-side panes, each with its own camera. Layout saved in the browser. |
+| Datasets | Pick one or more per scene from Nexus' list. |
+| Point cloud | 3D Tiles from Nexus, reloaded every 5 s; swaps only when fully loaded (no flicker). |
+| Live points | Newest ≤300k points on top, streamed ~1/s; toggle per dataset. |
+| Colours | Attribute + palette, shared by all users; changing it reloads tiles. |
+| Vessels | 3D hull with roll/pitch/heading; grey when >10 s stale. |
+| Follow | Camera eases after a vessel; pauses 2 s after manual panning. |
+| Basemap | Esri satellite imagery under every scene. |
+| Readouts | Status, camera position, FPS/memory per scene. |
 
-## Expanding the Oxlint configuration
+## Network
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```
+Browser ──gRPC-Web──▶ Nexus   lists, colour mode, tileset URL
+        ◀─stream────  Nexus   live points, vessel positions (1 stream each, auto-reconnect)
+        ──HTTP GET──▶ Nexus   tileset.json + .pnts (deck.gl loads these itself, browser-cached)
+        ──HTTP GET──▶ Esri    basemap tiles (internet)
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+- **gRPC-Web** (Connect, binary protobuf) for commands, queries and streams. Contract: `proto/nexus/v1/nexus_service.proto`, client generated into `src/gen/` (`npm run generate`).
+- **Plain HTTP** for tiles: the 3D Tiles standard is URL-based, and `GET` keeps browser caching.
+- Each open stream uses one of the browser's 6 connections to Nexus.
+
+## Run
+
+```
+npm install
+npm run dev        # http://localhost:2008 — Nexus' CORS allows only this origin
+```
+
+Nexus address: `VITE_API_URL` in `.env.local` (default `http://localhost:5007`).

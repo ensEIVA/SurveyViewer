@@ -43,9 +43,20 @@ service NexusService {
     // straight away, then a new one each time the vessel's position is updated, until the frontend closes the stream.
     // For several vessels, open one stream per vessel. Fails at the start with NOT_FOUND for an unknown vessel; once
     // open, while the position source cannot be reached the stream stays open and simply sends nothing new — compare
-    // timestamp with the current time to tell a stale position from a fresh one.
-    // TO AGREE: the update rate, and whether a slow frontend skips to the newest position like GetLivePoints.
+    // timestamp with the current time to tell a stale position from a fresh one. Nexus checks for a new position up to
+    // ten times a second (configurable), and sends one only when it is newer than the last; how often that is depends
+    // on the source. Every frontend following a vessel gets the same positions; one that reads slowly skips to the
+    // newest rather than falling behind.
     rpc GetVesselPosition(GetVesselPositionRequest) returns (stream GetVesselPositionResponse);
+
+    // A vessel's track: every position from the last history_sec seconds, oldest first, at most the last hour (3,600
+    // seconds; a longer request gets the last hour). Fewer, or none, if the vessel has not been reported that long; that
+    // is not an error. Asked for once, for example to draw a trail behind the vessel; GetVesselPosition then keeps it
+    // growing. To join the two without a gap, open the GetVesselPosition stream first, then ask for the history, and
+    // drop any streamed position whose timestamp is not after the history's last one. Fails with NOT_FOUND for an
+    // unknown vessel, INVALID_ARGUMENT for a malformed vessel id or a history_sec of 0 or less, UNAVAILABLE when the
+    // position source cannot be reached.
+    rpc GetVesselPositionHistory(GetVesselPositionHistoryRequest) returns (GetVesselPositionHistoryResponse);
 }
 
 message GetAvailableVesselsRequest { }
@@ -55,7 +66,7 @@ message GetAvailableVesselsResponse {
 }
 
 message VesselDescriptor {
-    // Stable identifier to pass to GetVesselPosition.
+    // Stable identifier to pass to GetVesselPosition and GetVesselPositionHistory: 1-64 letters, digits, '-' or '_'.
     string vessel_id = 1;
     // For display, e.g. "Vessel A".
     string display_name = 2;
@@ -73,9 +84,9 @@ message GetVesselPositionResponse {
     double pos_longitude = 1;
     // WGS84, degrees, north positive.
     double pos_latitude = 2;
-    // Metres above the WGS84 ellipsoid.
-    // TO AGREE: ellipsoid or mean sea level — they differ by up to about 100 m depending on location, which matters
-    // when the vessel is drawn next to the point clouds.
+    // Metres above the WGS84 ellipsoid (not mean sea level, which differs by up to about 100 m depending on location):
+    // the same reference as the datasets' georeferences, so the vessel is drawn in the right place next to the point
+    // clouds.
     double pos_height = 3;
     // Degrees, positive with starboard down.
     double rot_roll = 4;
@@ -85,6 +96,18 @@ message GetVesselPositionResponse {
     double rot_yaw = 6;
     // When the position was measured, not when it was sent.
     google.protobuf.Timestamp timestamp = 7;
+}
+
+message GetVesselPositionHistoryRequest {
+    // One of GetAvailableVesselsResponse's vessel ids.
+    string vessel_id = 1;
+    // How far back, in seconds from now: 1 or more, capped at 3,600.
+    int32 history_sec = 2;
+}
+
+message GetVesselPositionHistoryResponse {
+    // Oldest first; each as GetVesselPosition sends them.
+    repeated GetVesselPositionResponse vessel_positions = 1;
 }
 
 message GetAvailableDatasetsRequest {
