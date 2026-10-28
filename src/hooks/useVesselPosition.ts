@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
-import { VesselPosition as VesselPositionRow, VesselPositions_PositionTopic } from '../gen/nexus/v1/nexus_topics.fletcher'
+import { VesselPosition as VesselPositionRow } from '../gen/nexus/v1/nexus_topics.fletcher'
+import { VESSEL_POSITION_TOPIC } from '../services/topics'
 import { streamLog } from '../lib/streamStats'
 import { gateway } from '../services/gateway'
 
@@ -34,7 +35,7 @@ export function useVesselPosition(vesselId: string): VesselPositionStream {
   useEffect(() => {
     const logKey = streamLog.claim(`vessel:${vesselId}`)
     const unsubscribe = gateway.subscribe(
-      VesselPositions_PositionTopic,
+      VESSEL_POSITION_TOPIC,
       VesselPositionRow,
       row => {
         if (row.vessel_id !== vesselId) return

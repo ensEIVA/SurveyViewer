@@ -2,6 +2,7 @@ import { encodePositional, serializeEnvelope } from '@eiva/fletcher-gateway-clie
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { VesselPosition, type IVesselPosition } from '../gen/nexus/v1/nexus_topics.fletcher'
 import { GatewayConnection } from './gateway'
+import { VESSEL_POSITION_TOPIC } from './topics'
 
 // Stands in for the browser's WebSocket, which FletcherClient opens itself;
 // the test methods below play the gateway's side.
@@ -61,7 +62,7 @@ class FakeSocket {
   }
 }
 
-const TOPIC = 'nexus/topics/v1/VesselPositions/Position'
+const TOPIC = VESSEL_POSITION_TOPIC
 
 const position = (vessel_id: string): IVesselPosition => ({
   vessel_id,

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
-import { LivePointsSnapshot, LivePoints_SnapshotTopic } from '../gen/nexus/v1/nexus_topics.fletcher'
+import { LivePointsSnapshot } from '../gen/nexus/v1/nexus_topics.fletcher'
+import { LIVE_POINTS_TOPIC } from '../services/topics'
 import { decodeLivePoints, type LivePoints } from '../lib/livePoints'
 import { streamLog } from '../lib/streamStats'
 import { gateway } from '../services/gateway'
@@ -27,7 +28,7 @@ export function useLivePoints(datasetId: string, enabled: boolean): LivePointsSt
     if (!enabled) return
     const logKey = streamLog.claim(`points:${datasetId}`)
     const unsubscribe = gateway.subscribe(
-      LivePoints_SnapshotTopic,
+      LIVE_POINTS_TOPIC,
       LivePointsSnapshot,
       row => {
         if (row.dataset_id !== datasetId) return

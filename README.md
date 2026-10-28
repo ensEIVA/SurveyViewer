@@ -45,6 +45,6 @@ npm install
 npm run dev        # http://localhost:2008 — Nexus' CORS allows only this origin
 ```
 
-Needs a Fletcher gateway bridging Nexus's DDS domain, e.g. `gateway --port 9090 --provider fastdds --domain-id <Nexus's domain>` ([releases](https://github.com/eivacom/Fletcher/releases?q=gateway)).
+Live data needs a Fletcher gateway bridging Nexus's DDS domain: `npm run gateway` in a second terminal. It downloads the pinned release on first run (into `~/.cache/fletcher-gateway/`); set `FLETCHER_DOMAIN_ID` (default 0) to Nexus's domain, `GATEWAY_PORT` (default 9090) to move it. It reads with the DDS profiles in `scripts/gateway-profiles.xml` (best-effort readers; Nexus publishes live points best effort, which a reliable reader never matches); `GATEWAY_PROVIDER_CONFIG` points it at another file.
 
 Addresses in `.env.local`: Nexus `VITE_API_URL` (default `http://localhost:5007`), gateway `VITE_GATEWAY_URL` (default `ws://localhost:9090`).

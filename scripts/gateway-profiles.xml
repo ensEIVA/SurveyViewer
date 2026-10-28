@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- For the Fletcher gateway that forwards Nexus's topics to a browser: start it with the options provider fastdds,
+     domain-id <Nexus's Fletcher:DomainId> and provider-config <this file>. The gateway subscribes with the default reader, and Nexus publishes live points best effort
+     (fletcher-profiles.xml): a reliable reader does not match a best-effort writer, so with Fletcher's built-in
+     (reliable) default the gateway would get no live points at all. A best-effort reader matches reliable writers
+     too, so vessel positions still arrive. The document replaces Fletcher's built-in profiles; the default writer is
+     Fletcher's own. -->
+<dds xmlns="http://www.eprosima.com/XMLSchemas/fastRTPS_Profiles">
+  <profiles>
+    <participant profile_name="fletcher_participant">
+      <rtps><name>FletcherGateway</name></rtps>
+    </participant>
+
+    <data_reader profile_name="default_reader" is_default_profile="true">
+      <qos>
+        <durability><kind>VOLATILE</kind></durability>
+        <reliability><kind>BEST_EFFORT</kind></reliability>
+      </qos>
+      <topic>
+        <historyQos>
+          <kind>KEEP_LAST</kind>
+          <depth>25</depth>
+        </historyQos>
+        <resourceLimitsQos>
+          <max_samples>25</max_samples>
+          <max_instances>1</max_instances>
+          <max_samples_per_instance>25</max_samples_per_instance>
+          <allocated_samples>25</allocated_samples>
+        </resourceLimitsQos>
+      </topic>
+    </data_reader>
+
+    <data_writer profile_name="default_writer" is_default_profile="true">
+      <qos>
+        <durability><kind>VOLATILE</kind></durability>
+        <reliability><kind>RELIABLE</kind></reliability>
+      </qos>
+      <topic>
+        <historyQos>
+          <kind>KEEP_LAST</kind>
+          <depth>25</depth>
+        </historyQos>
+        <resourceLimitsQos>
+          <max_samples>25</max_samples>
+          <max_instances>1</max_instances>
+          <max_samples_per_instance>25</max_samples_per_instance>
+          <allocated_samples>25</allocated_samples>
+        </resourceLimitsQos>
+      </topic>
+    </data_writer>
+  </profiles>
+</dds>
