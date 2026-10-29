@@ -55,6 +55,21 @@ describe('summarize', () => {
     expect(stats.measuredGaps).toEqual([])
   })
 
+  it('counts the points in the newest message and per second', () => {
+    const counts = [100, 200, 300]
+    const stats = summarize(
+      everySecond(3).map((t, i) => ({ receivedAt: t, measuredAt: null, count: counts[i] })),
+      { factor: 3 },
+    )
+    // 200 + 300 points over the 2 s after the first message.
+    expect(stats.points).toEqual({ last: 300, perS: 250 })
+  })
+
+  it('has no point counts for streams without points', () => {
+    const stats = summarize(everySecond(3).map(t => ({ receivedAt: t, measuredAt: t })), { factor: 3 })
+    expect(stats.points).toBeNull()
+  })
+
   it('tells a source dropout from a transport dropout', () => {
     // Arrives steadily, but the sender's timestamps skip seconds 4-7.
     const measured = everySecond(20, [4, 5, 6, 7])

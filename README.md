@@ -1,50 +1,82 @@
 # SurveyViewer
 
-Browser 3D viewer for live survey point clouds and vessels. React + TypeScript + deck.gl. Talks to **Nexus**, and to a **Fletcher gateway** on this machine for its live data.
+Browser 3D viewer for live survey point clouds and vessels, fed by **Nexus**. React + TypeScript + deck.gl.
 
-## Status
+## Quick start
 
-- Branch `feature/datasets`, running against Nexus on a colleague's machine. No automated tests yet.
-- Open in the contract: vessel height reference (ellipsoid vs sea level) and update rate.
-- `npm run build` fails: unused constants in `src/layers/tilesetLayer.ts` (tile-tuning experiment).
-- Spike AB#21307 (deck.gl over gRPC): answered — tiles stay on HTTP; posting the conclusion is pending.
+You need Node.js and a running Nexus.
+
+1. Install:
+   ```
+   npm install
+   ```
+2. Point it at Nexus. Create `.env.local`:
+   ```
+   VITE_API_URL=http://<nexus-host>:5007
+   ```
+3. Start the gateway (live data), in its own terminal:
+   ```
+   npm run gateway
+   ```
+4. Start the viewer, in another terminal:
+   ```
+   npm run dev
+   ```
+5. Open http://localhost:2008, then add a dataset or vessel at the top.
+
+In VS Code, **F5** starts the viewer and opens Chrome with the debugger attached.
+
+## Settings
+
+| Variable | Where | Default | What |
+|---|---|---|---|
+| `VITE_API_URL` | `.env.local` | `http://localhost:5007` | Nexus |
+| `VITE_GATEWAY_URL` | `.env.local` | `ws://localhost:9090` | Fletcher gateway |
+| `FLETCHER_DOMAIN_ID` | shell, for `npm run gateway` | `0` | Nexus's DDS domain |
+| `GATEWAY_PORT` | shell, for `npm run gateway` | `9090` | Gateway port (match `VITE_GATEWAY_URL`) |
+| `GATEWAY_PROVIDER_CONFIG` | shell, for `npm run gateway` | `scripts/gateway-profiles.xml` | Fast DDS profiles |
+
+The viewer must run on port 2008: Nexus's CORS allows only that origin.
+
+## Commands
+
+| Command | Does |
+|---|---|
+| `npm run dev` | Viewer on http://localhost:2008 |
+| `npm run gateway` | Fletcher gateway on ws://localhost:9090 (downloads it on first run) |
+| `npm test` | Unit tests |
+| `npm run lint` | Lint |
+| `npm run build` | Type-check and production build |
+| `npm run generate` | Regenerate `src/gen/` from `proto/` |
+
+## Troubleshooting
+
+- **"Failed to fetch" for datasets or vessels:** Nexus isn't reachable at `VITE_API_URL`.
+- **No live points or vessels, but datasets load:** the gateway isn't running, or Nexus publishes on another domain (`FLETCHER_DOMAIN_ID`). Run only one gateway per machine.
+- **Port 2008 in use:** another `npm run dev` is still running.
+
+## How it works
+
+```
+Browser ──gRPC-Web──▶ Nexus     lists, colour mode, tileset URL
+        ◀─WebSocket─  gateway   live points, vessel positions (bridged from Nexus over DDS)
+        ──HTTP GET──▶ Nexus     3D Tiles (tileset.json + .pnts)
+        ──HTTP GET──▶ Esri      basemap
+```
+
+- **gRPC-Web** for queries. Contract: `proto/nexus/v1/nexus_service.proto`.
+- **Fletcher gateway** for live data: Nexus publishes on DDS, and the gateway on this machine forwards it over a WebSocket. Every topic carries all datasets and vessels; the viewer keeps the ones it shows. Contract: `proto/nexus/v1/nexus_topics.proto`. Connection code: `src/services/gateway.ts`.
+- **HTTP** for tiles, so the browser can cache them.
 
 ## Features
 
 | Feature | How |
 |---|---|
-| Scenes | Several side-by-side panes, each with its own camera. Layout saved in the browser. |
-| Datasets | Pick one or more per scene from Nexus' list. |
-| Point cloud | 3D Tiles from Nexus, reloaded every 5 s; swaps only when fully loaded (no flicker). |
-| Live points | Newest ≤300k points on top, streamed ~1/s; toggle per dataset. |
-| Colours | Attribute + palette, shared by all users; changing it reloads tiles. |
-| Vessels | 3D hull with roll/pitch/heading; grey when >10 s stale. |
-| Follow | Camera eases after a vessel; pauses 2 s after manual panning. |
-| Basemap | Esri satellite imagery under every scene. |
-| Readouts | Status, camera position, FPS/memory per scene. |
-
-## Network
-
-```
-Browser ──gRPC-Web──▶ Nexus     lists, colour mode, tileset URL
-        ◀─WebSocket─  Fletcher  live points, vessel positions (topics, bridged from Nexus over DDS)
-        ──HTTP GET──▶ Nexus     tileset.json + .pnts (deck.gl loads these itself, browser-cached)
-        ──HTTP GET──▶ Esri      basemap tiles (internet)
-```
-
-- **gRPC-Web** (Connect, binary protobuf) for commands and queries. Contract: `proto/nexus/v1/nexus_service.proto`, client generated into `src/gen/` by buf. Its `GetLivePoints` and `GetVesselPosition` streams are still served but unused.
-- **Fletcher gateway** (WebSocket, `@eiva/fletcher-gateway-client`) for the live data: Nexus publishes on DDS, the gateway bridges it to the browser. One shared connection (`src/services/gateway.ts`) subscribes each topic once, checks itself every 2 s and reconnects with backoff. Each topic carries every dataset or vessel; the viewer keeps the rows it shows. Contract: `proto/nexus/v1/nexus_topics.proto`, row schemas generated into `src/gen/` by `protoc-gen-fletcher`, as the backend does.
-- **Plain HTTP** for tiles: the 3D Tiles standard is URL-based, and `GET` keeps browser caching.
-
-`npm run generate` regenerates both from `proto/`.
-
-## Run
-
-```
-npm install
-npm run dev        # http://localhost:2008 — Nexus' CORS allows only this origin
-```
-
-Live data needs a Fletcher gateway bridging Nexus's DDS domain: `npm run gateway` in a second terminal. It downloads the pinned release on first run (into `~/.cache/fletcher-gateway/`); set `FLETCHER_DOMAIN_ID` (default 0) to Nexus's domain, `GATEWAY_PORT` (default 9090) to move it. It reads with the DDS profiles in `scripts/gateway-profiles.xml` (best-effort readers; Nexus publishes live points best effort, which a reliable reader never matches); `GATEWAY_PROVIDER_CONFIG` points it at another file.
-
-Addresses in `.env.local`: Nexus `VITE_API_URL` (default `http://localhost:5007`), gateway `VITE_GATEWAY_URL` (default `ws://localhost:9090`).
+| Scenes | Side-by-side panes, each with its own camera; layout saved in the browser. |
+| Datasets | One or more per scene, from Nexus's list. |
+| Point cloud | 3D Tiles, reloaded every 5 s; swaps only when fully loaded. |
+| Live points | Newest points on top, about once a second; toggle per dataset. |
+| Colours | Attribute + palette, shared by all users. |
+| Vessels | 3D hull with roll/pitch/heading; grey when over 10 s stale. |
+| Follow | Camera follows a vessel; pauses 2 s after you pan. |
+| Measurements | Rate, latency and gaps per stream; CSV export. |

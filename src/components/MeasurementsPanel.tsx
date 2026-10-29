@@ -11,6 +11,12 @@ const IMPLAUSIBLE_LATENCY_MS = 60 * 60 * 1000
 
 const secs = (ms: number) => `${(ms / 1000).toFixed(1)} s`
 const time = (ms: number) => new Date(ms).toLocaleTimeString()
+const count = (n: number) => Math.round(n).toLocaleString()
+
+function pointsText(points: StreamStats['points']) {
+  if (!points) return '–'
+  return points.perS === null ? count(points.last) : `${count(points.last)} · ${count(points.perS)}/s`
+}
 
 function latencyText(latency: StreamStats['latencyMs']) {
   if (!latency) return 'n/a (no timestamp)'
@@ -86,6 +92,7 @@ export function MeasurementsPanel({ onClose }: { onClose: () => void }) {
               <th>Msgs</th>
               <th>Rate</th>
               <th>Interval (med)</th>
+              <th>Points (last · rate)</th>
               <th>Latency ¹</th>
               <th>Arrival gaps ²</th>
               <th>Source gaps ³</th>
@@ -101,6 +108,7 @@ export function MeasurementsPanel({ onClose }: { onClose: () => void }) {
                   <td>{stats.samples}</td>
                   <td>{stats.ratePerS === null ? '–' : `${stats.ratePerS.toFixed(2)}/s`}</td>
                   <td>{stats.medianIntervalMs === null ? '–' : secs(stats.medianIntervalMs)}</td>
+                  <td>{pointsText(stats.points)}</td>
                   <td>{latencyText(stats.latencyMs)}</td>
                   <td>{gapsText(stats.arrivalGaps, true)}</td>
                   <td>{gapsText(stats.measuredGaps, hasTimestamps)}</td>

@@ -44,6 +44,9 @@ export interface StreamStats {
   medianIntervalMs: number | null
   // receivedAt - measuredAt over samples that have measuredAt; null if none.
   latencyMs: { median: number; p95: number; max: number; min: number } | null
+  // Points in the newest message, and per second over the recorded span
+  // (null below two samples); null for streams that don't carry points.
+  points: { last: number; perS: number | null } | null
   // Pauses in arrival: transport or Nexus dropping out.
   arrivalGaps: Gap[]
   // Pauses in measurement time: the source itself dropping out. Empty for
@@ -83,6 +86,9 @@ export function summarize(samples: Sample[], rule: GapRule): StreamStats {
   const latencies = samples
     .flatMap(s => (s.measuredAt === null ? [] : [s.receivedAt - s.measuredAt]))
     .sort(ascending)
+  const counts = samples.flatMap(s => (s.count === undefined ? [] : [s.count]))
+  // Like the rate: the first message only marks the start of the span.
+  const pointsAfterFirst = counts.slice(1).reduce((sum, n) => sum + n, 0)
   return {
     samples: samples.length,
     ratePerS: span > 0 ? ((samples.length - 1) * 1000) / span : null,
@@ -94,6 +100,9 @@ export function summarize(samples: Sample[], rule: GapRule): StreamStats {
           max: latencies[latencies.length - 1],
           min: latencies[0],
         }
+      : null,
+    points: counts.length
+      ? { last: counts[counts.length - 1], perS: span > 0 ? (pointsAfterFirst * 1000) / span : null }
       : null,
     arrivalGaps: findGaps(arrivals, rule),
     measuredGaps: findGaps(measured, rule),
